@@ -108,5 +108,14 @@ class MainActivity : AppCompatActivity() {
                 }
             }
         listView.adapter = adapter
+
+        // Launch app on item click
+        listView.setOnItemClickListener { _, _, position, _ ->
+            val info = apps[position]
+            val launchIntent = packageManager.getLaunchIntentForPackage(info.activityInfo.packageName)
+            if (launchIntent != null) {
+                startActivity(launchIntent)
+            }
+        }
     }
 }
