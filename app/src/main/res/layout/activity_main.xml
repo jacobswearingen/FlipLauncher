@@ -23,15 +23,12 @@
         android:text="00:00"
         android:textSize="24sp"
         android:layout_gravity="center_horizontal"/>
-    <!-- Grid of Apps -->
-    <GridView
-        android:id="@+id/appGrid"
+    <!-- List of Apps -->
+    <ListView
+        android:id="@+id/appList"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:numColumns="3"
-        android:verticalSpacing="8dp"
-        android:horizontalSpacing="8dp"
-        android:stretchMode="columnWidth"
-        android:gravity="center" />
+        android:dividerHeight="8dp"
+        android:layout_marginTop="16dp"/>
 
 </LinearLayout>
