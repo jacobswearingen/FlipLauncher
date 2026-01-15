@@ -7,7 +7,7 @@
     android:padding="8dp">
 
     <!-- Title -->
-    <TextView
+    <!-- <TextView
         android:id="@+id/launcherTitle"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
@@ -15,8 +15,14 @@
         android:textSize="18sp"
         android:textStyle="bold"
         android:gravity="center"
-        android:padding="8dp" />
-
+        android:padding="8dp" /> -->
+    <TextView
+        android:id="@+id/textViewTime"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="00:00"
+        android:textSize="24sp"
+        android:layout_gravity="center_horizontal"/>
     <!-- Grid of Apps -->
     <GridView
         android:id="@+id/appGrid"
