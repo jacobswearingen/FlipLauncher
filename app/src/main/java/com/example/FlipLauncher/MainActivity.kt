@@ -13,6 +13,7 @@ import android.widget.BaseAdapter
 import android.widget.GridView
 import android.widget.ListView
 import android.widget.TextView
+import android.widget.ImageView
 import androidx.appcompat.app.AppCompatActivity
 import java.text.SimpleDateFormat
 import java.util.Date
@@ -78,7 +79,7 @@ class MainActivity : AppCompatActivity() {
     private fun showAllApps() {
         setContentView(R.layout.activity_app_list)
         inAppListView = true
-        val apps = getInstalledApps() // Use ResolveInfo list
+        val apps = getInstalledApps()
         val listView = findViewById<ListView>(R.id.appList)
         val adapter =
             object : BaseAdapter() {
@@ -95,18 +96,14 @@ class MainActivity : AppCompatActivity() {
                         convertView
                             ?: LayoutInflater.from(this@MainActivity)
                                 .inflate(
-                                    android.R.layout.simple_list_item_1,
+                                    R.layout.app_list_item,
                                     parent,
                                     false
                                 )
-                    val textView = view.findViewById<TextView>(android.R.id.text1)
-                    textView.text = info.loadLabel(packageManager)
-                    textView.setCompoundDrawablesWithIntrinsicBounds(
-                        info.loadIcon(packageManager),
-                        null,
-                        null,
-                        null
-                    )
+                    val iconView = view.findViewById<ImageView>(R.id.appIcon)
+                    val labelView = view.findViewById<TextView>(R.id.appLabel)
+                    iconView.setImageDrawable(info.loadIcon(packageManager))
+                    labelView.text = info.loadLabel(packageManager)
                     return view
                 }
             }
