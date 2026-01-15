@@ -1,7 +1,9 @@
 package com.example.fliplauncher
 
 import android.content.Intent
+import android.content.pm.PackageInfo
 import android.content.pm.ResolveInfo
+import android.os.Build
 import android.os.Bundle
 import android.view.KeyEvent
 import android.view.LayoutInflater
@@ -15,7 +17,6 @@ import androidx.appcompat.app.AppCompatActivity
 import java.text.SimpleDateFormat
 import java.util.Date
 import java.util.Locale
-import android.os.Build
 import android.content.pm.PackageManager
 
 class MainActivity : AppCompatActivity() {
@@ -52,24 +53,32 @@ class MainActivity : AppCompatActivity() {
     }
 
     private fun getInstalledApps(): List<ResolveInfo> {
-        val intent =
-            Intent(Intent.ACTION_MAIN, null).apply { addCategory(Intent.CATEGORY_LAUNCHER) }
-        val apps =
-            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
-                packageManager.queryIntentActivities(
-                    intent,
-                    PackageManager.ResolveInfoFlags.of(0)
-                )
-            } else {
-                @Suppress("DEPRECATION") packageManager.queryIntentActivities(intent, 0)
-            }
-        return apps
+        val intent = Intent(Intent.ACTION_MAIN, null).apply { addCategory(Intent.CATEGORY_LAUNCHER) }
+        val launcherApps = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+            packageManager.queryIntentActivities(intent, PackageManager.ResolveInfoFlags.of(0))
+        } else {
+            @Suppress("DEPRECATION") packageManager.queryIntentActivities(intent, 0)
+        }
+
+        // To get all installed packages (including those without launcher icons):
+        // val packages = packageManager.getInstalledPackages(0)
+        // This returns List<PackageInfo>, not ResolveInfo.
+
+        return launcherApps // or use getInstalledPackages if you want all apps, but you'll need to adapt your adapter code.
+    }
+
+    private fun getAllInstalledPackages(): List<PackageInfo> {
+        return if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+            packageManager.getInstalledPackages(PackageManager.PackageInfoFlags.of(0))
+        } else {
+            @Suppress("DEPRECATION") packageManager.getInstalledPackages(0)
+        }
     }
 
     private fun showAllApps() {
         setContentView(R.layout.activity_app_list)
         inAppListView = true
-        val apps = getInstalledApps()
+        val apps = getAllInstalledPackages()
         val listView = findViewById<ListView>(R.id.appList)
         val adapter =
             object : BaseAdapter() {
@@ -91,9 +100,11 @@ class MainActivity : AppCompatActivity() {
                                     false
                                 )
                     val textView = view.findViewById<TextView>(android.R.id.text1)
-                    textView.text = info.loadLabel(packageManager)
+                    val appLabel = info.applicationInfo.loadLabel(packageManager)
+                    val appIcon = info.applicationInfo.loadIcon(packageManager)
+                    textView.text = appLabel
                     textView.setCompoundDrawablesWithIntrinsicBounds(
-                        info.loadIcon(packageManager),
+                        appIcon,
                         null,
                         null,
                         null
