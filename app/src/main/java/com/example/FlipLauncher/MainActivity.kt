@@ -78,7 +78,7 @@ class MainActivity : AppCompatActivity() {
     private fun showAllApps() {
         setContentView(R.layout.activity_app_list)
         inAppListView = true
-        val apps = getAllInstalledPackages()
+        val apps = getInstalledApps() // Use ResolveInfo list
         val listView = findViewById<ListView>(R.id.appList)
         val adapter =
             object : BaseAdapter() {
@@ -100,11 +100,9 @@ class MainActivity : AppCompatActivity() {
                                     false
                                 )
                     val textView = view.findViewById<TextView>(android.R.id.text1)
-                    val appLabel = info.applicationInfo.loadLabel(packageManager)
-                    val appIcon = info.applicationInfo.loadIcon(packageManager)
-                    textView.text = appLabel
+                    textView.text = info.loadLabel(packageManager)
                     textView.setCompoundDrawablesWithIntrinsicBounds(
-                        appIcon,
+                        info.loadIcon(packageManager),
                         null,
                         null,
                         null
