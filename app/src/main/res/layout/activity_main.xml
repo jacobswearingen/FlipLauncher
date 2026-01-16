@@ -17,52 +17,43 @@
         app:layout_constraintEnd_toEndOf="parent"
         android:layout_marginTop="48dp"/>
 
-    <!-- Bottom Bar with "Notifications", "Menu", and "Shortcuts" -->
-    <LinearLayout
-        android:id="@+id/bottomBar"
+    <!-- Bottom left: Notifications -->
+    <TextView
+        android:id="@+id/textViewNotifications"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:orientation="horizontal"
-        android:gravity="center"
+        android:text="Notifications"
+        android:textSize="18sp"
+        android:textColor="#FFFFFF"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        android:layout_marginStart="8dp"
+        android:layout_marginBottom="8dp"/>
+
+    <!-- Bottom center: Menu -->
+    <TextView
+        android:id="@+id/textViewMenu"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Menu"
+        android:textSize="18sp"
+        android:textColor="#FFFFFF"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
-        android:layout_marginBottom="16dp">
+        android:layout_marginBottom="8dp"/>
 
-        <!-- Bottom left: Notifications -->
-        <TextView
-            android:id="@+id/textViewNotifications"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="Notifications"
-            android:textSize="18sp"
-            android:textColor="#FFFFFF"
-            app:layout_constraintBottom_toBottomOf="parent"
-            app:layout_constraintStart_toStartOf="parent"
-            android:layout_marginStart="8dp"
-            android:layout_marginBottom="8dp"/>
-        <TextView
-            android:id="@+id/textViewMenu"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="Menu"
-            android:textSize="18sp"
-            android:textColor="#FFFFFF"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintEnd_toEndOf="parent"
-            android:layout_marginBottom="8dp"/>
-        <!-- Bottom right: Shortcuts -->
-        <TextView
-            android:id="@+id/textViewShortcuts"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="Shortcuts"
-            android:textSize="18sp"
-            android:textColor="#FFFFFF"
-            app:layout_constraintBottom_toBottomOf="parent"
-            app:layout_constraintEnd_toEndOf="parent"
-            android:layout_marginEnd="8dp"
-            android:layout_marginBottom="8dp"/>
-    </LinearLayout>
+    <!-- Bottom right: Shortcuts -->
+    <TextView
+        android:id="@+id/textViewShortcuts"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Shortcuts"
+        android:textSize="18sp"
+        android:textColor="#FFFFFF"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        android:layout_marginEnd="8dp"
+        android:layout_marginBottom="8dp"/>
 
 </androidx.constraintlayout.widget.ConstraintLayout>
