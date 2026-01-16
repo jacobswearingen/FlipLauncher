@@ -1,16 +1,16 @@
 <?xml version="1.0" encoding="utf-8"?>
-<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<androidx.constraintlayout.widget.ConstraintLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:padding="8dp"
     android:background="#000000">
 
-    <LinearLayout
+    <FrameLayout
         android:id="@+id/timeContainer"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:orientation="horizontal"
         app:layout_constraintTop_toTopOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
@@ -23,11 +23,7 @@
             android:text="00:00"
             android:textColor="#FFFFFF"
             android:textSize="80sp"
-            android:fontFamily="serif"
-            app:layout_constraintTop_toTopOf="parent"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintEnd_toEndOf="parent"
-            android:layout_marginTop="48dp"/>
+            android:fontFamily="serif"/>
 
         <TextView
             android:id="@+id/textViewAmPm"
@@ -37,11 +33,10 @@
             android:textColor="#FFFFFF"
             android:textSize="24sp"
             android:fontFamily="serif"
-            app:layout_constraintTop_toBottomOf="@id/textViewTime"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintEnd_toEndOf="parent"/>
-
-    </LinearLayout>
+            android:layout_gravity="bottom|end"
+            android:layout_marginEnd="4dp"
+            android:layout_marginBottom="4dp"/>
+    </FrameLayout>
 
     <TextView
         android:id="@+id/textViewDate"
