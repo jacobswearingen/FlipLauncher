@@ -22,8 +22,8 @@
             android:layout_height="wrap_content"
             android:text="00:00"
             android:textColor="#FFFFFF"
-            android:textSize="48sp"
-            android:fontFamily="monospace"/>
+            android:textSize="72sp"
+            android:fontFamily="serif"/>
 
         <TextView
             android:id="@+id/textViewAmPm"
