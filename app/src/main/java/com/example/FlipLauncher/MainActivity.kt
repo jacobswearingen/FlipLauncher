@@ -43,12 +43,24 @@ class MainActivity : AppCompatActivity() {
             showAllApps()
             return true
         }
+
+        return super.onKeyDown(keyCode, event)
+    }
+
+    override fun onKeyUp(keyCode: Int, event: KeyEvent?): Boolean {
         if (keyCode == KeyEvent.KEYCODE_POWER) {
             onBackPressed()
             return true
         }
-        return super.onKeyDown(keyCode, event)
+        return super.onKeyUp(keyCode, event)
     }
+
+    override fun onResume() {
+        super.onResume()
+        if (!inAppListView) {
+            updateTimeViews()
+        }
+    }   
 
     override fun onBackPressed() {
         if (inAppListView) {
