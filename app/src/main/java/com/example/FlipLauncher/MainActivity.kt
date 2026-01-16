@@ -34,9 +34,11 @@ class MainActivity : AppCompatActivity() {
     private fun updateTimeViews() {
         val sdf = SimpleDateFormat("h:mm", Locale.getDefault())
         val ampm = SimpleDateFormat("a", Locale.getDefault())
+        val dateFormat = SimpleDateFormat("EEE, MMM d", Locale.getDefault())
         val currentDate = Date()
         findViewById<TextView>(R.id.textViewTime).text = sdf.format(currentDate)
         findViewById<TextView>(R.id.textViewAmPm).text = ampm.format(currentDate)
+        findViewById<TextView>(R.id.textViewDate).text = dateFormat.format(currentDate)
     }
     override fun onKeyDown(keyCode: Int, event: KeyEvent?): Boolean {
         if (keyCode == KeyEvent.KEYCODE_DPAD_CENTER) {
@@ -56,13 +58,6 @@ class MainActivity : AppCompatActivity() {
         }
         return super.onKeyDown(keyCode, event)
     }
-
-    override fun onResume() {
-        super.onResume()
-        if (!inAppListView) {
-            updateTimeViews()
-        }
-    }   
 
     override fun onBackPressed() {
         if (inAppListView) {
