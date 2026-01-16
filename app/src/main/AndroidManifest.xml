@@ -2,7 +2,7 @@
 
     <application
         android:label="FlipLauncher"
-        android:theme="@style/Theme.AppCompat.Light.NoActionBar">
+        android:theme="@style/Theme.AppCompat.DayNight.NoActionBar">
         <activity 
             android:name=".MainActivity"
             android:exported="true">
