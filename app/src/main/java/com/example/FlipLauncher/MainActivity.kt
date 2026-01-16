@@ -43,6 +43,10 @@ class MainActivity : AppCompatActivity() {
             showAllApps()
             return true
         }
+        if (keyCode == KeyEvent.KEYCODE_ENDCALL) {
+            onBackPressed()
+            return true
+        }
         return super.onKeyDown(keyCode, event)
     }
 
@@ -63,20 +67,7 @@ class MainActivity : AppCompatActivity() {
         } else {
             @Suppress("DEPRECATION") packageManager.queryIntentActivities(intent, 0)
         }
-
-        // To get all installed packages (including those without launcher icons):
-        // val packages = packageManager.getInstalledPackages(0)
-        // This returns List<PackageInfo>, not ResolveInfo.
-
         return launcherApps // or use getInstalledPackages if you want all apps, but you'll need to adapt your adapter code.
-    }
-
-    private fun getAllInstalledPackages(): List<PackageInfo> {
-        return if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
-            packageManager.getInstalledPackages(PackageManager.PackageInfoFlags.of(0))
-        } else {
-            @Suppress("DEPRECATION") packageManager.getInstalledPackages(0)
-        }
     }
 
     private fun showAllApps() {
