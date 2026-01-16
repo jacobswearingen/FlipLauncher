@@ -1,4 +1,4 @@
-package com.example.fliplauncher
+package com.jacobswearingen.fliplauncher
 
 import android.content.Intent
 import android.content.pm.PackageInfo

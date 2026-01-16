@@ -3,11 +3,11 @@ plugins {
     id 'org.jetbrains.kotlin.android'
 }
 android {
-    namespace = "com.example.fliplauncher"
+    namespace = "com.jacobswearingen.fliplauncher"
     compileSdk = 33
 
     defaultConfig {
-        applicationId = "com.example.fliplauncher"
+        applicationId = "com.jacobswearingen.fliplauncher"
         minSdk = 30
         targetSdk = 33
         versionCode = 1
