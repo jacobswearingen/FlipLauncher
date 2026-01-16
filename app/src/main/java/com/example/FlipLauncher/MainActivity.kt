@@ -28,14 +28,16 @@ class MainActivity : AppCompatActivity() {
         AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_YES)
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
-        val textViewTime = findViewById<TextView>(R.id.textViewTime)
-        val sdf = SimpleDateFormat("hh:mm", Locale.getDefault())
+        updateTimeViews()
+    }
+
+    private fun updateTimeViews() {
+        val sdf = SimpleDateFormat("h:mm", Locale.getDefault())
         val ampm = SimpleDateFormat("a", Locale.getDefault())
         val currentDate = Date()
         findViewById<TextView>(R.id.textViewTime).text = sdf.format(currentDate)
         findViewById<TextView>(R.id.textViewAmPm).text = ampm.format(currentDate)
     }
-
     override fun onKeyDown(keyCode: Int, event: KeyEvent?): Boolean {
         if (keyCode == KeyEvent.KEYCODE_DPAD_CENTER) {
             showAllApps()
@@ -47,12 +49,7 @@ class MainActivity : AppCompatActivity() {
     override fun onBackPressed() {
         if (inAppListView) {
             setContentView(R.layout.activity_main)
-            val textViewTime = findViewById<TextView>(R.id.textViewTime)
-            val sdf = SimpleDateFormat("hh:mm", Locale.getDefault())
-            val ampm = SimpleDateFormat("a", Locale.getDefault())
-            val currentDate = Date()
-            findViewById<TextView>(R.id.textViewTime).text = sdf.format(currentDate)
-            findViewById<TextView>(R.id.textViewAmPm).text = ampm.format(currentDate)
+            updateTimeViews()
             inAppListView = false
         } else {
             super.onBackPressed()
