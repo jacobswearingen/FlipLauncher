@@ -43,16 +43,18 @@ class MainActivity : AppCompatActivity() {
             showAllApps()
             return true
         }
-
-        return super.onKeyDown(keyCode, event)
-    }
-
-    override fun onKeyUp(keyCode: Int, event: KeyEvent?): Boolean {
-        if (keyCode == KeyEvent.KEYCODE_POWER) {
-            onBackPressed()
+        if (keyCode == 139 /* KEYCODE_SOFT_LEFT */) {
+            try {
+                val statusBarService = getSystemService("statusbar")
+                val statusBarManagerClass = Class.forName("android.app.StatusBarManager")
+                val expandNotificationsPanel = statusBarManagerClass.getMethod("expandNotificationsPanel")
+                expandNotificationsPanel.invoke(statusBarService)
+            } catch (e: Exception) {
+                // Handle exception or show a message
+            }
             return true
         }
-        return super.onKeyUp(keyCode, event)
+        return super.onKeyDown(keyCode, event)
     }
 
     override fun onResume() {
