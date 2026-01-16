@@ -29,7 +29,7 @@ class MainActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
         val textViewTime = findViewById<TextView>(R.id.textViewTime)
-        val sdf = SimpleDateFormat("HH:mm", Locale.getDefault())
+        val sdf = SimpleDateFormat("hh:mm a", Locale.getDefault())
         val currentTime = sdf.format(Date())
         textViewTime.text = currentTime
     }
@@ -46,7 +46,7 @@ class MainActivity : AppCompatActivity() {
         if (inAppListView) {
             setContentView(R.layout.activity_main)
             val textViewTime = findViewById<TextView>(R.id.textViewTime)
-            val sdf = SimpleDateFormat("HH:mm", Locale.getDefault())
+            val sdf = SimpleDateFormat("hh:mm a", Locale.getDefault())
             val currentTime = sdf.format(Date())
             textViewTime.text = currentTime
             inAppListView = false

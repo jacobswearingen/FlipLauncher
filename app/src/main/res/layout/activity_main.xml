@@ -13,6 +13,8 @@
         android:text="00:00"
         android:textColor="#FFFFFF"
         android:textSize="80sp"
+        android:textStyle="bold"
+        android:fontFamily="monospace"
         app:layout_constraintTop_toTopOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
