@@ -29,9 +29,11 @@ class MainActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
         val textViewTime = findViewById<TextView>(R.id.textViewTime)
-        val sdf = SimpleDateFormat("hh:mm a", Locale.getDefault())
-        val currentTime = sdf.format(Date())
-        textViewTime.text = currentTime
+        val sdf = SimpleDateFormat("hh:mm", Locale.getDefault())
+        val ampm = SimpleDateFormat("a", Locale.getDefault())
+        val currentDate = Date()
+        findViewById<TextView>(R.id.textViewTime).text = sdf.format(currentDate)
+        findViewById<TextView>(R.id.textViewAmPm).text = ampm.format(currentDate)
     }
 
     override fun onKeyDown(keyCode: Int, event: KeyEvent?): Boolean {
@@ -46,9 +48,11 @@ class MainActivity : AppCompatActivity() {
         if (inAppListView) {
             setContentView(R.layout.activity_main)
             val textViewTime = findViewById<TextView>(R.id.textViewTime)
-            val sdf = SimpleDateFormat("hh:mm a", Locale.getDefault())
-            val currentTime = sdf.format(Date())
-            textViewTime.text = currentTime
+            val sdf = SimpleDateFormat("hh:mm", Locale.getDefault())
+            val ampm = SimpleDateFormat("a", Locale.getDefault())
+            val currentDate = Date()
+            findViewById<TextView>(R.id.textViewTime).text = sdf.format(currentDate)
+            findViewById<TextView>(R.id.textViewAmPm).text = ampm.format(currentDate)
             inAppListView = false
         } else {
             super.onBackPressed()
