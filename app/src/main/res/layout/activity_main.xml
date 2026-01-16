@@ -1,21 +1,10 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:orientation="vertical"
-    android:background="#000000"
     android:padding="8dp">
 
-    <!-- Title -->
-    <!-- <TextView
-        android:id="@+id/launcherTitle"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:text="FlipLauncher"
-        android:textSize="18sp"
-        android:textStyle="bold"
-        android:gravity="center"
-        android:padding="8dp" /> -->
     <TextView
         android:id="@+id/textViewTime"
         android:layout_width="wrap_content"
@@ -24,12 +13,42 @@
         android:textColor="#FFFFFF"
         android:textSize="96sp"
         android:layout_gravity="center_horizontal"/>
-    <!-- List of Apps -->
-    <ListView
-        android:id="@+id/appList"
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:dividerHeight="8dp"
-        android:layout_marginTop="16dp"/>
 
-</LinearLayout>
+    <!-- Centered "Menu" -->
+    <TextView
+        android:id="@+id/textViewMenu"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Menu"
+        android:textSize="18sp"
+        android:textColor="#FFFFFF"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"/>
+
+    <!-- Bottom "Notifications" -->
+    <TextView
+        android:id="@+id/textViewNotifications"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Notifications"
+        android:textSize="18sp"
+        android:textColor="#FFFFFF"
+        app:layout_constraintBottom_toTopOf="@+id/textViewShortcuts"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        android:layout_marginBottom="8dp"/>
+
+    <!-- Bottom "Shortcuts" -->
+    <TextView
+        android:id="@+id/textViewShortcuts"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Shortcuts"
+        android:textSize="18sp"
+        android:textColor="#FFFFFF"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"/>
+</androidx.constraintlayout.widget.ConstraintLayout>
