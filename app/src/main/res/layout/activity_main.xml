@@ -23,18 +23,17 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="00:00"
-            android:textColor="#FFFFFF"
+            style="@style/MainText"
             android:textSize="80sp"
             android:fontFamily="serif"/>
 
         <TextView
             android:id="@+id/textViewAmPm"
+            style="@style/MainText"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="AM"
-            android:textColor="#FFFFFF"
             android:textSize="24sp"
-            android:fontFamily="serif"
             android:layout_gravity="bottom"
             android:layout_marginStart="8dp"/>
     </LinearLayout>
@@ -44,9 +43,8 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:text="Thu, Jan 15"
-        android:textColor="#FFFFFF"
+        style="@style/MainText"
         android:textSize="18sp"
-        android:fontFamily="serif"
         app:layout_constraintTop_toBottomOf="@id/timeContainer"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent"/>
@@ -58,7 +56,7 @@
         android:layout_height="wrap_content"
         android:text="Notifications"
         android:textSize="18sp"
-        android:textColor="#FFFFFF"
+        style="@style/MainText"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         android:layout_marginStart="4dp"
@@ -71,7 +69,7 @@
         android:layout_height="wrap_content"
         android:text="Menu"
         android:textSize="18sp"
-        android:textColor="#FFFFFF"
+        style="@style/MainText"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
@@ -84,7 +82,7 @@
         android:layout_height="wrap_content"
         android:text="Shortcuts"
         android:textSize="18sp"
-        android:textColor="#FFFFFF"
+        style="@style/MainText"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         android:layout_marginEnd="4dp"
