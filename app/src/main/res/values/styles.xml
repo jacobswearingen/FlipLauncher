@@ -1,5 +1,7 @@
 <!-- res/values/styles.xml -->
-<style name="MainText">
-    <item name="android:textColor">#FFFFFF</item>
-    <item name="android:fontFamily">serif</item>
-</style>
+<resources>
+    <style name="MainText">
+        <item name="android:textColor">#FFFFFF</item>
+        <item name="android:fontFamily">serif</item>
+    </style>
+</resources>
