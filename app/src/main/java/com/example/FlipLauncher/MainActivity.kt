@@ -81,7 +81,7 @@ class MainActivity : AppCompatActivity() {
     private fun showAllApps() {
         setContentView(R.layout.activity_app_list)
         inAppListView = true
-        val apps = getInstalledApps()
+        val apps = getInstalledApps().sortedBy { it.loadLabel(packageManager).toString().lowercase(Locale.getDefault()) }
         val listView = findViewById<ListView>(R.id.appList)
         val adapter =
             object : BaseAdapter() {
@@ -110,14 +110,5 @@ class MainActivity : AppCompatActivity() {
                 }
             }
         listView.adapter = adapter
-
-        // Launch app on item click
-        listView.setOnItemClickListener { _, _, position, _ ->
-            val info = apps[position]
-            val launchIntent = packageManager.getLaunchIntentForPackage(info.activityInfo.packageName)
-            if (launchIntent != null) {
-                startActivity(launchIntent)
-            }
-        }
     }
 }
