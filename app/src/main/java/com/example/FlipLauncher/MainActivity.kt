@@ -43,7 +43,7 @@ class MainActivity : AppCompatActivity() {
             showAllApps()
             return true
         }
-        if (keyCode == KeyEvent.KEYCODE_ENDCALL) {
+        if (keyCode == KeyEvent.KEYCODE_POWER) {
             onBackPressed()
             return true
         }
