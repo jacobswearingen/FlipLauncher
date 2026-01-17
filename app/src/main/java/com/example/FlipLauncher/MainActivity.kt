@@ -20,6 +20,9 @@ import java.text.SimpleDateFormat
 import java.util.Date
 import java.util.Locale
 import android.content.pm.PackageManager
+import android.provider.Settings
+import android.widget.Toast
+import androidx.core.app.NotificationManagerCompat
 
 class MainActivity : AppCompatActivity() {
     private var inMainView = true
@@ -29,6 +32,21 @@ class MainActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
         updateTimeViews()
+        
+        if (!hasNotificationAccess()) {
+            Toast.makeText(this, "Please enable notification access for FlipLauncher", Toast.LENGTH_LONG).show()
+            requestNotificationAccess()
+        }
+    }
+
+    private fun hasNotificationAccess(): Boolean {
+        val enabledPackages = NotificationManagerCompat.getEnabledListenerPackages(this)
+        return enabledPackages.contains(packageName)
+    }
+
+    private fun requestNotificationAccess() {
+        val intent = Intent(Settings.ACTION_NOTIFICATION_LISTENER_SETTINGS)
+        startActivity(intent)
     }
 
     private fun updateTimeViews() {

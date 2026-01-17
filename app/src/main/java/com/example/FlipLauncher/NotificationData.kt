@@ -8,6 +8,6 @@ object NotificationData {
     }
 
     fun removeNotification(key: String) {
-        // Optional: implement removal logic
+        notifications.remove(key)
     }
 }
