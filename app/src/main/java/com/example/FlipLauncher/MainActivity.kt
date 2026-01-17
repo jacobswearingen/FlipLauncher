@@ -22,7 +22,7 @@ import java.util.Locale
 import android.content.pm.PackageManager
 
 class MainActivity : AppCompatActivity() {
-    private var inAppListView = false
+    private var inMainView = true
 
     override fun onCreate(savedInstanceState: Bundle?) {
         AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_YES)
@@ -40,30 +40,47 @@ class MainActivity : AppCompatActivity() {
         findViewById<TextView>(R.id.textViewAmPm).text = ampm.format(currentDate)
         findViewById<TextView>(R.id.textViewDate).text = dateFormat.format(currentDate)
     }
+
     override fun onKeyDown(keyCode: Int, event: KeyEvent?): Boolean {
-        if (keyCode == KeyEvent.KEYCODE_DPAD_CENTER) {
-            showAllApps()
-            return true
-        }
-        if (keyCode == 139 /* KEYCODE_SOFT_LEFT */) {
-            try {
-                val statusBarService = getSystemService("statusbar")
-                val statusBarManagerClass = Class.forName("android.app.StatusBarManager")
-                val expandNotificationsPanel = statusBarManagerClass.getMethod("expandNotificationsPanel")
-                expandNotificationsPanel.invoke(statusBarService)
-            } catch (e: Exception) {
-                // Handle exception or show a message
+        return when (keyCode) {
+            KeyEvent.KEYCODE_DPAD_CENTER -> {
+                showAllApps() // Show app grid
+                true
             }
-            return true
+            KeyEvent.KEYCODE_SOFT_LEFT, 139 -> { // Handle SOFT_LEFT key
+                showNotificationsView() // Show notifications view
+                true
+            }
+            else -> super.onKeyDown(keyCode, event)
         }
-        return super.onKeyDown(keyCode, event)
+    }
+ 
+    private fun showNotificationsView() {
+        setContentView(R.layout.activity_notifications)
+        inMainView = false
+        val listView = findViewById<ListView>(R.id.notificationList)
+
+        val adapter = object : BaseAdapter() {
+            override fun getCount() = NotificationData.notifications.size
+            override fun getItem(position: Int) = NotificationData.notifications[position]
+            override fun getItemId(position: Int) = position.toLong()
+            override fun getView(position: Int, convertView: View?, parent: ViewGroup?): View {
+                val view = convertView ?: LayoutInflater.from(this@MainActivity)
+                    .inflate(android.R.layout.simple_list_item_1, parent, false)
+                val textView = view.findViewById<TextView>(android.R.id.text1)
+                textView.text = NotificationData.notifications[position]
+                return view
+            }
+        }
+
+        listView.adapter = adapter
     }
 
     override fun onBackPressed() {
-        if (inAppListView) {
+        if (!inMainView) {
             setContentView(R.layout.activity_main)
             updateTimeViews()
-            inAppListView = false
+            inMainView = true
         } else {
             super.onBackPressed()
         }
@@ -81,7 +98,7 @@ class MainActivity : AppCompatActivity() {
 
     private fun showAllApps() {
         setContentView(R.layout.activity_app_list)
-        inAppListView = true
+        inMainView = false
         val apps = getInstalledApps().sortedBy { it.loadLabel(packageManager).toString().lowercase(Locale.getDefault()) }
         val listView = findViewById<ListView>(R.id.appList)
         val adapter =
