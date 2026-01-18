@@ -1,28 +1,18 @@
 package com.jacobswearingen.fliplauncher
 
 import android.content.Intent
-import android.content.pm.PackageInfo
+import android.content.pm.PackageManager
 import android.content.pm.ResolveInfo
 import android.os.Build
 import android.os.Bundle
-import android.view.KeyEvent
-import android.view.LayoutInflater
-import android.view.View
-import android.view.ViewGroup
-import android.widget.BaseAdapter
-import android.widget.GridView
-import android.widget.ListView
-import android.widget.TextView
-import android.widget.ImageView
+import android.provider.Settings
+import android.view.*
+import android.widget.*
 import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.app.AppCompatDelegate
-import java.text.SimpleDateFormat
-import java.util.Date
-import java.util.Locale
-import android.content.pm.PackageManager
-import android.provider.Settings
-import android.widget.Toast
 import androidx.core.app.NotificationManagerCompat
+import java.text.SimpleDateFormat
+import java.util.*
 
 class MainActivity : AppCompatActivity() {
     private var inMainView = true
@@ -32,9 +22,14 @@ class MainActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
         updateTimeViews()
-        
+
         if (!hasNotificationAccess()) {
-            Toast.makeText(this, "Please enable notification access for FlipLauncher", Toast.LENGTH_LONG).show()
+            Toast.makeText(
+                            this,
+                            "Please enable notification access for FlipLauncher",
+                            Toast.LENGTH_LONG
+                    )
+                    .show()
             requestNotificationAccess()
         }
     }
@@ -72,24 +67,35 @@ class MainActivity : AppCompatActivity() {
             else -> super.onKeyDown(keyCode, event)
         }
     }
- 
+
     private fun showNotificationsView() {
         setContentView(R.layout.activity_notifications)
         inMainView = false
         val listView = findViewById<ListView>(R.id.notificationList)
 
-        val adapter = object : BaseAdapter() {
-            override fun getCount() = NotificationData.notifications.size
-            override fun getItem(position: Int) = NotificationData.notifications[position]
-            override fun getItemId(position: Int) = position.toLong()
-            override fun getView(position: Int, convertView: View?, parent: ViewGroup?): View {
-                val view = convertView ?: LayoutInflater.from(this@MainActivity)
-                    .inflate(android.R.layout.simple_list_item_1, parent, false)
-                val textView = view.findViewById<TextView>(android.R.id.text1)
-                textView.text = NotificationData.notifications[position]
-                return view
-            }
-        }
+        val adapter =
+                object : BaseAdapter() {
+                    override fun getCount() = NotificationData.notifications.size
+                    override fun getItem(position: Int) = NotificationData.notifications[position]
+                    override fun getItemId(position: Int) = position.toLong()
+                    override fun getView(
+                            position: Int,
+                            convertView: View?,
+                            parent: ViewGroup?
+                    ): View {
+                        val view =
+                                convertView
+                                        ?: LayoutInflater.from(this@MainActivity)
+                                                .inflate(
+                                                        android.R.layout.simple_list_item_1,
+                                                        parent,
+                                                        false
+                                                )
+                        val textView = view.findViewById<TextView>(android.R.id.text1)
+                        textView.text = NotificationData.notifications[position]
+                        return view
+                    }
+                }
 
         listView.adapter = adapter
     }
@@ -105,51 +111,57 @@ class MainActivity : AppCompatActivity() {
     }
 
     private fun getInstalledApps(): List<ResolveInfo> {
-        val intent = Intent(Intent.ACTION_MAIN, null).apply { addCategory(Intent.CATEGORY_LAUNCHER) }
-        val launcherApps = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
-            packageManager.queryIntentActivities(intent, PackageManager.ResolveInfoFlags.of(0))
-        } else {
-            @Suppress("DEPRECATION") packageManager.queryIntentActivities(intent, 0)
-        }
-        return launcherApps // or use getInstalledPackages if you want all apps, but you'll need to adapt your adapter code.
+        val intent =
+                Intent(Intent.ACTION_MAIN, null).apply { addCategory(Intent.CATEGORY_LAUNCHER) }
+        val launcherApps =
+                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+                    packageManager.queryIntentActivities(
+                            intent,
+                            PackageManager.ResolveInfoFlags.of(0)
+                    )
+                } else {
+                    @Suppress("DEPRECATION") packageManager.queryIntentActivities(intent, 0)
+                }
+        return launcherApps // or use getInstalledPackages if you want all apps, but you'll need to
+        // adapt your adapter code.
     }
 
     private fun showAllApps() {
         setContentView(R.layout.activity_app_list)
         inMainView = false
-        val apps = getInstalledApps().sortedBy { it.loadLabel(packageManager).toString().lowercase(Locale.getDefault()) }
+        val apps =
+                getInstalledApps().sortedBy {
+                    it.loadLabel(packageManager).toString().lowercase(Locale.getDefault())
+                }
         val listView = findViewById<ListView>(R.id.appList)
         val adapter =
-            object : BaseAdapter() {
-                override fun getCount() = apps.size
-                override fun getItem(position: Int) = apps[position]
-                override fun getItemId(position: Int) = position.toLong()
-                override fun getView(
-                    position: Int,
-                    convertView: View?,
-                    parent: ViewGroup?
-                ): View {
-                    val info = apps[position]
-                    val view =
-                        convertView
-                            ?: LayoutInflater.from(this@MainActivity)
-                                .inflate(
-                                    R.layout.app_list_item,
-                                    parent,
-                                    false
-                                )
-                    val iconView = view.findViewById<ImageView>(R.id.appIcon)
-                    val labelView = view.findViewById<TextView>(R.id.appLabel)
-                    iconView.setImageDrawable(info.loadIcon(packageManager))
-                    labelView.text = info.loadLabel(packageManager)
-                    return view
+                object : BaseAdapter() {
+                    override fun getCount() = apps.size
+                    override fun getItem(position: Int) = apps[position]
+                    override fun getItemId(position: Int) = position.toLong()
+                    override fun getView(
+                            position: Int,
+                            convertView: View?,
+                            parent: ViewGroup?
+                    ): View {
+                        val info = apps[position]
+                        val view =
+                                convertView
+                                        ?: LayoutInflater.from(this@MainActivity)
+                                                .inflate(R.layout.app_list_item, parent, false)
+                        val iconView = view.findViewById<ImageView>(R.id.appIcon)
+                        val labelView = view.findViewById<TextView>(R.id.appLabel)
+                        iconView.setImageDrawable(info.loadIcon(packageManager))
+                        labelView.text = info.loadLabel(packageManager)
+                        return view
+                    }
                 }
-            }
         listView.adapter = adapter
         // Launch app on item click
         listView.setOnItemClickListener { _, _, position, _ ->
             val info = apps[position]
-            val launchIntent = packageManager.getLaunchIntentForPackage(info.activityInfo.packageName)
+            val launchIntent =
+                    packageManager.getLaunchIntentForPackage(info.activityInfo.packageName)
             if (launchIntent != null) {
                 startActivity(launchIntent)
             }
