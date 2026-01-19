@@ -80,9 +80,17 @@ class MainActivity : AppCompatActivity() {
             override fun getItemId(position: Int) = position.toLong()
             override fun getView(position: Int, convertView: View?, parent: ViewGroup?): View {
                 val view = convertView ?: LayoutInflater.from(this@MainActivity)
-                    .inflate(android.R.layout.simple_list_item_1, parent, false)
-                val textView = view.findViewById<TextView>(android.R.id.text1)
-                textView.text = notifications[position].text
+                    .inflate(R.layout.notification_list_item, parent, false)
+                val iconView = view.findViewById<ImageView>(R.id.appIcon)
+                val textView = view.findViewById<TextView>(R.id.notificationText)
+                val entry = notifications[position]
+                textView.text = entry.text
+                try {
+                    val appIcon = packageManager.getApplicationIcon(entry.packageName)
+                    iconView.setImageDrawable(appIcon)
+                } catch (e: Exception) {
+                    iconView.setImageResource(R.mipmap.ic_launcher) // fallback icon
+                }
                 return view
             }
         }
