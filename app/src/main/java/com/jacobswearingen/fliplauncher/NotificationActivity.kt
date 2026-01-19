@@ -7,7 +7,8 @@ class NotificationService : NotificationListenerService() {
     override fun onNotificationPosted(sbn: StatusBarNotification) {
         val title = sbn.notification.extras.getString("android.title") ?: ""
         val text = sbn.notification.extras.getString("android.text") ?: ""
-        NotificationData.addNotification(sbn.key, "$title: $text")
+        val packageName = sbn.packageName
+        NotificationData.addNotification(sbn.key, "$title: $text", packageName)
     }
 
     override fun onNotificationRemoved(sbn: StatusBarNotification) {
@@ -19,7 +20,8 @@ class NotificationService : NotificationListenerService() {
         activeNotifications?.forEach { sbn ->
             val title = sbn.notification.extras.getString("android.title") ?: ""
             val text = sbn.notification.extras.getString("android.text") ?: ""
-            NotificationData.addNotification(sbn.key, "$title: $text")
+            val packageName = sbn.packageName
+            NotificationData.addNotification(sbn.key, "$title: $text", packageName)
         }
     }
 }

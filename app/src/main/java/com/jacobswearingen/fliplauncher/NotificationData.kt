@@ -1,15 +1,17 @@
 package com.jacobswearingen.fliplauncher
 
-object NotificationData {
-    val notifications = mutableMapOf<String, String>()
+data class NotificationEntry(val text: String, val packageName: String)
 
-    fun addNotification(key: String, text: String) {
-        notifications[key] = text
+object NotificationData {
+    private val notifications = mutableMapOf<String, NotificationEntry>()
+
+    fun addNotification(key: String, text: String, packageName: String) {
+        notifications[key] = NotificationEntry(text, packageName)
     }
 
     fun removeNotification(key: String) {
         notifications.remove(key)
     }
 
-    fun getAll(): List<String> = notifications.values.toList()
+    fun getAll(): List<NotificationEntry> = notifications.values.toList()
 }
