@@ -73,29 +73,18 @@ class MainActivity : AppCompatActivity() {
         inMainView = false
         val listView = findViewById<ListView>(R.id.notificationList)
 
-        val adapter =
-                object : BaseAdapter() {
-                    override fun getCount() = NotificationData.notifications.size
-                    override fun getItem(position: Int) = NotificationData.notifications[position]
-                    override fun getItemId(position: Int) = position.toLong()
-                    override fun getView(
-                            position: Int,
-                            convertView: View?,
-                            parent: ViewGroup?
-                    ): View {
-                        val view =
-                                convertView
-                                        ?: LayoutInflater.from(this@MainActivity)
-                                                .inflate(
-                                                        android.R.layout.simple_list_item_1,
-                                                        parent,
-                                                        false
-                                                )
-                        val textView = view.findViewById<TextView>(android.R.id.text1)
-                        textView.text = NotificationData.notifications[position]
-                        return view
-                    }
-                }
+        val adapter = object : BaseAdapter() {
+            override fun getCount() = NotificationData.getAll().size
+            override fun getItem(position: Int) = NotificationData.getAll()[position]
+            override fun getItemId(position: Int) = position.toLong()
+            override fun getView(position: Int, convertView: View?, parent: ViewGroup?): View {
+                val view = convertView ?: LayoutInflater.from(this@MainActivity)
+                    .inflate(android.R.layout.simple_list_item_1, parent, false)
+                val textView = view.findViewById<TextView>(android.R.id.text1)
+                textView.text = NotificationData.getAll()[position]
+                return view
+            }
+        }
 
         listView.adapter = adapter
     }
