@@ -89,7 +89,7 @@ class MainActivity : AppCompatActivity() {
                     val appIcon = packageManager.getApplicationIcon(entry.packageName)
                     iconView.setImageDrawable(appIcon)
                 } catch (e: Exception) {
-                    iconView.setImageResource(R.mipmap.ic_launcher) // fallback icon
+                    iconView.setImageResource(android.R.drawable.sym_def_app_icon) // fallback icon
                 }
                 return view
             }
