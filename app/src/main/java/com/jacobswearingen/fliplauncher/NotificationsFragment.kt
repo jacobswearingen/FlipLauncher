@@ -7,16 +7,21 @@ import android.view.ViewGroup
 import android.widget.*
 import androidx.fragment.app.Fragment
 
-class NotificationsFragment : Fragment(R.layout.fragment_notifications) {
+class NotificationsFragment : Fragment(R.layout.fragment_notifications), KeyEventHandler {
 
     private var selectedNotificationIndex = 0
+    private lateinit var listView: ListView
+    private lateinit var adapter: BaseAdapter
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-        val listView = view.findViewById<ListView>(R.id.notificationList)
-        val notifications = NotificationData.getAll()
+        listView = view.findViewById(R.id.notificationList)
+        setupList()
+    }
 
-        val adapter = object : BaseAdapter() {
+    private fun setupList() {
+        val notifications = NotificationData.getAll()
+        adapter = object : BaseAdapter() {
             override fun getCount() = notifications.size
             override fun getItem(position: Int) = notifications[position]
             override fun getItemId(position: Int) = position.toLong()
@@ -36,7 +41,6 @@ class NotificationsFragment : Fragment(R.layout.fragment_notifications) {
         }
         listView.adapter = adapter
 
-        // Restore selection if needed
         if (notifications.isNotEmpty()) {
             selectedNotificationIndex = selectedNotificationIndex.coerceAtMost(notifications.size - 1)
             listView.setSelection(selectedNotificationIndex)
@@ -56,5 +60,22 @@ class NotificationsFragment : Fragment(R.layout.fragment_notifications) {
 
             override fun onNothingSelected(parent: AdapterView<*>) {}
         }
+    }
+
+    override fun onKeyDown(keyCode: Int, event: android.view.KeyEvent?): Boolean {
+        if (keyCode == android.view.KeyEvent.KEYCODE_SOFT_LEFT || keyCode == 139) {
+            val position = listView.selectedItemPosition
+            val notifications = NotificationData.getAll()
+            if (position in notifications.indices) {
+                // Remove the notification by key
+                val key = NotificationData.getKeyAt(position)
+                if (key != null) {
+                    NotificationData.removeNotification(key)
+                    setupList() // Refresh the list
+                }
+            }
+            return true
+        }
+        return false
     }
 }
