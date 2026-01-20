@@ -22,6 +22,14 @@ class NotificationService : NotificationListenerService() {
             val isNoClear = flags and Notification.FLAG_NO_CLEAR != 0
             return !isOngoing && !isNoClear
         }
+
+        fun clearAllSystemNotifications() {
+            instance?.activeNotifications?.forEach { sbn ->
+                if (isNotificationCancelable(sbn)) {
+                    instance?.cancelNotification(sbn.key)
+                }
+            }
+        }
     }
 
     override fun onCreate() {

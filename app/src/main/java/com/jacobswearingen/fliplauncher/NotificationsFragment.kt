@@ -58,16 +58,22 @@ class NotificationsFragment : Fragment(R.layout.fragment_notifications),
     }
 
     override fun onKeyDown(keyCode: Int, event: android.view.KeyEvent?): Boolean {
-        if (keyCode == android.view.KeyEvent.KEYCODE_SOFT_LEFT || keyCode == 139) {
-            val position = listView.selectedItemPosition
-            if (position in notifications.indices) {
-                val key = NotificationData.getKeyAt(position)
-                if (key != null) {
-                    NotificationService.cancelNotificationByKey(key)
-                    // No need to call onNotificationDataChanged or setupList, listener will update UI
+        when (keyCode) {
+            android.view.KeyEvent.KEYCODE_SOFT_LEFT, 139 -> {
+                val position = listView.selectedItemPosition
+                if (position in notifications.indices) {
+                    val key = NotificationData.getKeyAt(position)
+                    if (key != null) {
+                        NotificationService.cancelNotificationByKey(key)
+                        // UI will update via listener
+                    }
                 }
+                return true
             }
-            return true
+            android.view.KeyEvent.KEYCODE_SOFT_RIGHT, 48 -> {
+                NotificationService.clearAllSystemNotifications()
+                return true
+            }
         }
         return false
     }
