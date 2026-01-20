@@ -30,12 +30,13 @@ class AppListFragment : Fragment(R.layout.fragment_app_list) {
                     .inflate(R.layout.app_list_item, parent, false)
                 val labelView = v.findViewById<TextView>(R.id.appLabel)
                 labelView.text = info.loadLabel(pm)
+                val iconView = v.findViewById<ImageView>(R.id.appIcon)
                 val icon = try {
                     info.loadIcon(pm)
                 } catch (_: Exception) {
                     requireContext().getDrawable(android.R.drawable.sym_def_app_icon)
                 }
-                labelView.setCompoundDrawablesWithIntrinsicBounds(icon, null, null, null)
+                iconView.setImageDrawable(icon)
                 return v
             }
         }
