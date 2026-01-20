@@ -7,7 +7,8 @@ import android.view.ViewGroup
 import android.widget.*
 import androidx.fragment.app.Fragment
 
-class NotificationsFragment : Fragment(R.layout.fragment_notifications), KeyEventHandler {
+class NotificationsFragment : Fragment(R.layout.fragment_notifications),
+    KeyEventHandler, NotificationData.Listener {
 
     private var selectedNotificationIndex = 0
     private lateinit var listView: ListView
@@ -17,6 +18,12 @@ class NotificationsFragment : Fragment(R.layout.fragment_notifications), KeyEven
         super.onViewCreated(view, savedInstanceState)
         listView = view.findViewById(R.id.notificationList)
         setupList()
+        NotificationData.addListener(this)
+    }
+
+    override fun onDestroyView() {
+        super.onDestroyView()
+        NotificationData.removeListener(this)
     }
 
     private fun setupList() {
@@ -77,5 +84,9 @@ class NotificationsFragment : Fragment(R.layout.fragment_notifications), KeyEven
             return true
         }
         return false
+    }
+
+    override fun onNotificationDataChanged() {
+        setupList()
     }
 }
