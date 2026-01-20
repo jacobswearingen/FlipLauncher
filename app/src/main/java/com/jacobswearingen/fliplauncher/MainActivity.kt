@@ -14,7 +14,6 @@ class MainActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
 
-        // Check notification access
         if (!hasNotificationAccess()) {
             Toast.makeText(
                 this,
@@ -23,12 +22,6 @@ class MainActivity : AppCompatActivity() {
             ).show()
             requestNotificationAccess()
         }
-
-        // Setup Navigation
-        // val navHostFragment = supportFragmentManager
-        //     .findFragmentById(R.id.nav_host_fragment) as NavHostFragment
-        // val navController = navHostFragment.navController
-        // NavigationUI.setupActionBarWithNavController(this, navController)
     }
 
     private fun hasNotificationAccess(): Boolean {
@@ -41,7 +34,6 @@ class MainActivity : AppCompatActivity() {
         startActivity(intent)
     }
 
-    // Optional: Delegate key events to fragments that implement KeyEventHandler
     override fun onKeyDown(keyCode: Int, event: android.view.KeyEvent?): Boolean {
         val navHostFragment = supportFragmentManager.findFragmentById(R.id.nav_host_fragment)
         val currentFragment = navHostFragment?.childFragmentManager?.fragments?.firstOrNull()

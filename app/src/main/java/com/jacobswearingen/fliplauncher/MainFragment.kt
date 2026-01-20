@@ -16,7 +16,6 @@ class MainFragment : Fragment(R.layout.fragment_main), KeyEventHandler {
         super.onViewCreated(view, savedInstanceState)
         AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_YES)
         updateTimeViews(view)
-        // Add navigation or other logic here if needed
     }
 
     private fun updateTimeViews(view: View) = with(view) {
@@ -29,12 +28,10 @@ class MainFragment : Fragment(R.layout.fragment_main), KeyEventHandler {
     override fun onKeyDown(keyCode: Int, event: android.view.KeyEvent?): Boolean {
         when (keyCode) {
             android.view.KeyEvent.KEYCODE_SOFT_LEFT, 139 -> {
-                // Navigate to NotificationsFragment
                 findNavController().navigate(R.id.notificationsFragment)
                 return true
             }
             android.view.KeyEvent.KEYCODE_DPAD_CENTER, 28 -> {
-                // Navigate to AppListFragment
                 findNavController().navigate(R.id.appListFragment)
                 return true
             }
