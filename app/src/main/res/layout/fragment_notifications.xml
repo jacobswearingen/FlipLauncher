@@ -16,4 +16,46 @@
         android:id="@+id/notificationList"
         android:layout_width="match_parent"
         android:layout_height="match_parent" />
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:layout_gravity="bottom"
+        android:layout_marginBottom="4dp">
+
+        <TextView
+            android:id="@+id/textViewNotifications"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            app:layout_constraintStart_toStartOf="parent"
+            android:text="Clear"
+            android:textSize="18sp"
+            style="@style/MainText"
+            android:layout_marginStart="4dp" />
+
+        <TextView
+            android:id="@+id/textViewMenu"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            android:text="View"
+            android:textSize="18sp"
+            style="@style/MainText" />
+
+        <TextView
+            android:id="@+id/textViewShortcuts"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            app:layout_constraintEnd_toEndOf="parent"
+            android:text="Clear All"
+            android:textSize="18sp"
+            style="@style/MainText"
+            android:layout_marginEnd="4dp" />
+    </LinearLayout>
+
 </LinearLayout>
