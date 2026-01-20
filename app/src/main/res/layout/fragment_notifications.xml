@@ -1,10 +1,12 @@
-<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<androidx.constraintlayout.widget.ConstraintLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:padding="8dp">
 
     <TextView
+        android:id="@+id/headerText"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:text="Notifications"
@@ -12,19 +14,11 @@
         android:textStyle="bold"
         android:gravity="center" />
 
-    <ListView
-        android:id="@+id/notificationList"
-        android:layout_width="match_parent"
-        android:layout_height="0dp"
-        android:layout_marginBottom="8dp"
-        app:layout_constraintBottom_toTopOf="@+id/textViewShortcuts"
-        app:layout_constraintTop_toBottomOf="@+id/textViewNotifications" />
-
     <LinearLayout
+        android:id="@+id/bottomBar"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:orientation="horizontal"
-        android:layout_gravity="bottom"
         android:layout_marginBottom="4dp"
         app:layout_constraintBottom_toBottomOf="parent">
 
@@ -33,7 +27,6 @@
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_weight="1"
-            app:layout_constraintStart_toStartOf="parent"
             android:text="Clear"
             android:textSize="18sp"
             style="@style/MainText"
@@ -44,8 +37,6 @@
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_weight="1"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintEnd_toEndOf="parent"
             android:text="View"
             android:textSize="18sp"
             style="@style/MainText" />
@@ -55,11 +46,18 @@
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_weight="1"
-            app:layout_constraintEnd_toEndOf="parent"
             android:text="Clear All"
             android:textSize="18sp"
             style="@style/MainText"
             android:layout_marginEnd="4dp" />
     </LinearLayout>
+
+    <ListView
+        android:id="@+id/notificationList"
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        app:layout_constraintTop_toBottomOf="@id/headerText"
+        app:layout_constraintBottom_toTopOf="@id/bottomBar"
+        android:layout_marginBottom="8dp" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>
