@@ -27,7 +27,7 @@ class AppListFragment : Fragment(R.layout.fragment_app_list) {
             override fun getView(position: Int, convertView: View?, parent: ViewGroup?): View {
                 val info = apps[position]
                 val v = convertView ?: LayoutInflater.from(parent?.context ?: requireContext())
-                    .inflate(R.layout.app_list_item, parent, false)
+                    .inflate(R.layout.item_app_list, parent, false)
                 val labelView = v.findViewById<TextView>(R.id.appLabel)
                 labelView.text = info.loadLabel(pm)
                 val iconView = v.findViewById<ImageView>(R.id.appIcon)

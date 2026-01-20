@@ -84,7 +84,7 @@ class NotificationsFragment : Fragment(R.layout.fragment_notifications),
         override fun getItemId(position: Int) = position.toLong()
         override fun getView(position: Int, convertView: View?, parent: ViewGroup?): View {
             val v = convertView ?: LayoutInflater.from(parent?.context ?: requireContext())
-                .inflate(R.layout.notification_list_item, parent, false)
+                .inflate(R.layout.item_notification_list, parent, false)
             v.findViewById<ImageView>(R.id.appIcon).apply {
                 try {
                     setImageDrawable(requireContext().packageManager.getApplicationIcon(getItem(position).packageName))
