@@ -12,7 +12,9 @@
         android:text="Notifications"
         android:textSize="18sp"
         android:textStyle="bold"
+        app:layout_constraintTop_toTopOf="parent"
         android:gravity="center" />
+        
 
     <LinearLayout
         android:id="@+id/bottomBar"
