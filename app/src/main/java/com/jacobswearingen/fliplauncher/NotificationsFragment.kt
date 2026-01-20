@@ -26,7 +26,7 @@ class NotificationsFragment : Fragment(R.layout.fragment_notifications) {
                 v.findViewById<ImageView>(R.id.appIcon).apply {
                     try {
                         setImageDrawable(requireContext().packageManager.getApplicationIcon(getItem(position).packageName))
-                    } catch (e: Exception) {
+                    } catch (_: Exception) {
                         setImageResource(android.R.drawable.sym_def_app_icon)
                     }
                 }
@@ -49,11 +49,12 @@ class NotificationsFragment : Fragment(R.layout.fragment_notifications) {
                 ?: Toast.makeText(requireContext(), "Cannot launch app", Toast.LENGTH_SHORT).show()
         }
 
-        listView.setOnItemSelectedListener(object : AdapterView.OnItemSelectedListener {
+        listView.onItemSelectedListener = object : AdapterView.OnItemSelectedListener {
             override fun onItemSelected(parent: AdapterView<*>, view: View?, position: Int, id: Long) {
                 selectedNotificationIndex = position
             }
+
             override fun onNothingSelected(parent: AdapterView<*>) {}
-        })
+        }
     }
 }
