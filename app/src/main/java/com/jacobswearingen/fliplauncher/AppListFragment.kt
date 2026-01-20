@@ -28,10 +28,14 @@ class AppListFragment : Fragment(R.layout.fragment_app_list) {
                 val info = apps[position]
                 val v = convertView ?: LayoutInflater.from(parent?.context ?: requireContext())
                     .inflate(R.layout.app_list_item, parent, false)
-                v.findViewById<ImageView>(R.id.appIcon).setImageDrawable(info.loadIcon(pm))
                 val labelView = v.findViewById<TextView>(R.id.appLabel)
                 labelView.text = info.loadLabel(pm)
-                labelView.setCompoundDrawablesWithIntrinsicBounds(info.loadIcon(pm), null, null, null)
+                val icon = try {
+                    info.loadIcon(pm)
+                } catch (e: Exception) {
+                    requireContext().getDrawable(android.R.drawable.sym_def_app_icon)
+                }
+                labelView.setCompoundDrawablesWithIntrinsicBounds(icon, null, null, null)
                 return v
             }
         }

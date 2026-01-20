@@ -2,7 +2,6 @@
     android:id="@+id/appLabel"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:drawableStart="@drawable/ic_launcher_foreground" 
     android:drawablePadding="12dp"
     style="@style/MainText"
     android:textSize="16sp"
