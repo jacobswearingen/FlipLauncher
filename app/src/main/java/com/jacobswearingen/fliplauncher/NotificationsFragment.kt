@@ -70,7 +70,7 @@ class NotificationsFragment : Fragment(R.layout.fragment_notifications), KeyEven
                 // Remove the notification by key
                 val key = NotificationData.getKeyAt(position)
                 if (key != null) {
-                    NotificationData.removeNotification(key)
+                    NotificationService.cancelNotificationByKey(key)
                     setupList() // Refresh the list
                 }
             }
