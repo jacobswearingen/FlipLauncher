@@ -29,7 +29,9 @@ class AppListFragment : Fragment(R.layout.fragment_app_list) {
                 val v = convertView ?: LayoutInflater.from(parent?.context ?: requireContext())
                     .inflate(R.layout.app_list_item, parent, false)
                 v.findViewById<ImageView>(R.id.appIcon).setImageDrawable(info.loadIcon(pm))
-                v.findViewById<TextView>(R.id.appLabel).text = info.loadLabel(pm)
+                val labelView = v.findViewById<TextView>(R.id.appLabel)
+                labelView.text = info.loadLabel(pm)
+                labelView.setCompoundDrawablesWithIntrinsicBounds(info.loadIcon(pm), null, null, null)
                 return v
             }
         }
