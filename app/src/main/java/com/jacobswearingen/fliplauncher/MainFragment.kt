@@ -17,7 +17,6 @@ class MainFragment : Fragment(R.layout.fragment_main), KeyEventHandler {
         AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_YES)
         updateTimeViews(view)
         // Add navigation or other logic here if needed
-
     }
 
     private fun updateTimeViews(view: View) = with(view) {
