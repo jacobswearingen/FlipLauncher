@@ -28,10 +28,10 @@ class MainActivity : AppCompatActivity() {
         }
 
         // Setup Navigation
-        val navHostFragment = supportFragmentManager
-            .findFragmentById(R.id.nav_host_fragment) as NavHostFragment
-        val navController = navHostFragment.navController
-        NavigationUI.setupActionBarWithNavController(this, navController)
+        // val navHostFragment = supportFragmentManager
+        //     .findFragmentById(R.id.nav_host_fragment) as NavHostFragment
+        // val navController = navHostFragment.navController
+        // NavigationUI.setupActionBarWithNavController(this, navController)
     }
 
     private fun hasNotificationAccess(): Boolean {
