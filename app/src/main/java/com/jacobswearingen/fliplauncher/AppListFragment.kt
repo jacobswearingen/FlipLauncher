@@ -32,7 +32,7 @@ class AppListFragment : Fragment(R.layout.fragment_app_list) {
                 labelView.text = info.loadLabel(pm)
                 val icon = try {
                     info.loadIcon(pm)
-                } catch (e: Exception) {
+                } catch (_: Exception) {
                     requireContext().getDrawable(android.R.drawable.sym_def_app_icon)
                 }
                 labelView.setCompoundDrawablesWithIntrinsicBounds(icon, null, null, null)
