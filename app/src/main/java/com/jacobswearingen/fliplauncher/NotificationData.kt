@@ -14,4 +14,12 @@ object NotificationData {
     }
 
     fun getAll(): List<NotificationEntry> = notifications.values.toList()
+
+    fun getKeyAt(index: Int): String? {
+        return notifications.keys.elementAtOrNull(index)
+    }
+
+    fun clearAll() {
+        notifications.clear()
+    }
 }

@@ -1,91 +1,9 @@
 <?xml version="1.0" encoding="utf-8"?>
-<androidx.constraintlayout.widget.ConstraintLayout
+<androidx.fragment.app.FragmentContainerView
     xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:id="@+id/nav_host_fragment"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:padding="8dp"
-    android:background="#000000">
-
-    <LinearLayout
-        android:id="@+id/timeContainer"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:orientation="horizontal"
-        android:gravity="bottom"
-        app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        android:layout_marginTop="48dp">
-
-        <TextView
-            android:id="@+id/textViewTime"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="00:00"
-            style="@style/MainText"
-            android:textSize="80sp"
-            android:fontFamily="serif"/>
-
-        <TextView
-            android:id="@+id/textViewAmPm"
-            style="@style/MainText"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="AM"
-            android:textSize="24sp"
-            android:layout_gravity="bottom"
-            android:layout_marginStart="8dp"/>
-    </LinearLayout>
-
-    <TextView
-        android:id="@+id/textViewDate"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="Thu, Jan 15"
-        style="@style/MainText"
-        android:textSize="18sp"
-        app:layout_constraintTop_toBottomOf="@id/timeContainer"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"/>
-
-    <!-- Bottom left: Notifications -->
-    <TextView
-        android:id="@+id/textViewNotifications"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="Notifications"
-        android:textSize="18sp"
-        style="@style/MainText"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        android:layout_marginStart="4dp"
-        android:layout_marginBottom="4dp"/>
-
-    <!-- Bottom center: Menu -->
-    <TextView
-        android:id="@+id/textViewMenu"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="Menu"
-        android:textSize="18sp"
-        style="@style/MainText"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        android:layout_marginBottom="4dp"/>
-
-    <!-- Bottom right: Shortcuts -->
-    <TextView
-        android:id="@+id/textViewShortcuts"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="Shortcuts"
-        android:textSize="18sp"
-        style="@style/MainText"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        android:layout_marginEnd="4dp"
-        android:layout_marginBottom="4dp"/>
-
-</androidx.constraintlayout.widget.ConstraintLayout>
+    app:navGraph="@navigation/nav_graph"
+    app:defaultNavHost="true" />

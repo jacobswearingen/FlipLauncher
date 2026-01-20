@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="utf-8"?>
+<navigation xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    app:startDestination="@id/mainFragment">
+
+    <fragment
+        android:id="@+id/mainFragment"
+        android:name="com.jacobswearingen.fliplauncher.MainFragment"
+        android:label="Main" />
+    <fragment
+        android:id="@+id/notificationsFragment"
+        android:name="com.jacobswearingen.fliplauncher.NotificationsFragment"
+        android:label="Notifications" />
+    <fragment
+        android:id="@+id/appListFragment"
+        android:name="com.jacobswearingen.fliplauncher.AppListFragment"
+        android:label="Apps" />
+</navigation>
