@@ -22,8 +22,7 @@ class AppListFragment : Fragment(R.layout.fragment_app_list) {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-        viewModel = ViewModelProvider(this, ViewModelProvider.AndroidViewModelFactory.getInstance(requireActivity().application))
-            .get(AppListViewModel::class.java)
+        viewModel = ViewModelProvider(this, ViewModelProvider.AndroidViewModelFactory.getInstance(requireActivity().application))[AppListViewModel::class.java]
         val listView = view.findViewById<ListView>(R.id.appList)
         listView.adapter = AppListAdapter()
         listView.setOnItemClickListener { _, _, position, _ ->
