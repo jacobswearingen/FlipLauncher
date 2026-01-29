@@ -115,14 +115,13 @@ class NotificationsFragment : Fragment(R.layout.fragment_notifications), KeyEven
             }
 
             // Format and show timestamp in 12-hour format (e.g., 3:45 PM)
-            val timestampView = v.findViewById<TextView>(R.id.notificationTimestamp)
-            val relativeTime = android.text.format.DateUtils.getRelativeTimeSpanString(
-                sbn.postTime,
-                System.currentTimeMillis(),
-                android.text.format.DateUtils.MINUTE_IN_MILLIS,
-                android.text.format.DateUtils.FORMAT_ABBREV_RELATIVE
-            )
-            timestampView.text = relativeTime
+            v.findViewById<TextView>(R.id.notificationTimestamp).text =
+                android.text.format.DateUtils.getRelativeTimeSpanString(
+                    sbn.postTime,
+                    System.currentTimeMillis(),
+                    android.text.format.DateUtils.MINUTE_IN_MILLIS,
+                    android.text.format.DateUtils.FORMAT_ABBREV_RELATIVE
+                )
 
             return v
         }
