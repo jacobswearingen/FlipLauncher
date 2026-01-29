@@ -114,7 +114,8 @@ class NotificationsFragment : Fragment(R.layout.fragment_notifications), KeyEven
             with(sbn.notification.extras) {
                 val title = getCharSequence(Notification.EXTRA_TITLE)?.toString() ?: ""
                 val text = getCharSequence(Notification.EXTRA_TEXT)?.toString() ?: ""
-                v.findViewById<TextView>(R.id.notificationText).text = "$title: $text"
+                val notificationTextView = v.findViewById<TextView>(R.id.notificationText)
+                notificationTextView.text = "$title: $text"
             }
 
             v.findViewById<TextView>(R.id.notificationTimestamp).text =

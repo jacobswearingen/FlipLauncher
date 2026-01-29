@@ -30,9 +30,19 @@ class NotificationsViewModel(application: Application) : AndroidViewModel(applic
     @Suppress("DEPRECATION")
     private fun loadNotifications() {
         viewModelScope.launch(Dispatchers.Default) {
+            val context = getApplication<Application>()
+            val nm = context.getSystemService(android.app.NotificationManager::class.java)
             val sorted = NotificationService.getActiveNotifications()
-                .sortedWith(compareByDescending<StatusBarNotification> { it.notification.priority }
-                    .thenByDescending { it.postTime })
+                .sortedWith(
+                    compareByDescending<StatusBarNotification> { it.notification.priority }
+                        .thenBy { it.notification.channelId ?: "" }
+                        .thenByDescending {
+                            val channelId = it.notification.channelId
+                            if (channelId != null) nm.getNotificationChannel(channelId)?.importance else null
+                                ?: it.notification.priority
+                        }
+                        .thenByDescending { it.postTime }
+                )
             _notifications.postValue(sorted)
         }
     }
