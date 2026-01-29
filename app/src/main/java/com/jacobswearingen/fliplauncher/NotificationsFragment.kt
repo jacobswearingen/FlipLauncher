@@ -47,7 +47,7 @@ class NotificationsFragment : Fragment(R.layout.fragment_notifications), KeyEven
             if (intent != null) {
                 try {
                     intent.send()
-                    navController.popBackStack()
+                    navController.popBackStack(R.id.mainFragment, false)
                 } catch (e: Exception) {
                     Toast.makeText(requireContext(), "Cannot perform action", Toast.LENGTH_SHORT).show()
                 }
