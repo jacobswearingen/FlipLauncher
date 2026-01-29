@@ -1,4 +1,8 @@
 <resources>
+    <style name="Theme.FlipLauncher" parent="Theme.MaterialComponents.DayNight.NoActionBar">
+        <item name="android:windowBackground">#000000</item>
+        <item name="android:statusBarColor">#000000</item>
+    </style>
     <style name="MainText">
         <item name="android:textColor">#FFFFFF</item>
     </style>
