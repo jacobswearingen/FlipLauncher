@@ -16,22 +16,27 @@ class AppListFragment : Fragment(R.layout.fragment_app_list) {
 
     private val pm by lazy { requireContext().packageManager }
     private lateinit var viewModel: AppListViewModel
-    private val apps by lazy {
-        viewModel.getApps(pm).sortedBy { it.loadLabel(pm).toString().lowercase() }
-    }
+    private var apps: List<android.content.pm.ResolveInfo> = emptyList()
+    private lateinit var adapter: AppListAdapter
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         viewModel = ViewModelProvider(this, ViewModelProvider.AndroidViewModelFactory.getInstance(requireActivity().application))[AppListViewModel::class.java]
         val listView = view.findViewById<ListView>(R.id.appList)
-        listView.adapter = AppListAdapter()
+        adapter = AppListAdapter()
+        listView.adapter = adapter
         listView.setOnItemClickListener { _, _, position, _ ->
             val info = apps[position]
-                pm.getLaunchIntentForPackage(info.activityInfo.packageName)?.let { 
-                    startActivity(it)
-                    findNavController().popBackStack(R.id.mainFragment, false)
-                }
+            pm.getLaunchIntentForPackage(info.activityInfo.packageName)?.let {
+                startActivity(it)
+                findNavController().popBackStack(R.id.mainFragment, false)
+            }
         }
+        viewModel.apps.observe(viewLifecycleOwner) { loadedApps ->
+            apps = loadedApps
+            adapter.notifyDataSetChanged()
+        }
+        viewModel.loadApps(pm)
     }
 
     private inner class AppListAdapter : BaseAdapter() {
