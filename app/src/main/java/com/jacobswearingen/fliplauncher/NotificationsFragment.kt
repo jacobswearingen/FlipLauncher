@@ -55,7 +55,7 @@ class NotificationsFragment : Fragment(R.layout.fragment_notifications), KeyEven
                 requireContext().packageManager.getLaunchIntentForPackage(sbn.packageName)
                     ?.let {
                         startActivity(it)
-                        navController.popBackStack()
+                        navController.popBackStack(R.id.mainFragment, false)
                     }
                     ?: Toast.makeText(requireContext(), "Cannot launch app", Toast.LENGTH_SHORT).show()
             }

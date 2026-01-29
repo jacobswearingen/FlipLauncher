@@ -24,8 +24,10 @@ class AppListFragment : Fragment(R.layout.fragment_app_list) {
         listView.adapter = AppListAdapter()
         listView.setOnItemClickListener { _, _, position, _ ->
             val info = apps[position]
-            pm.getLaunchIntentForPackage(info.activityInfo.packageName)?.let { startActivity(it) }
-            findNavController().popBackStack()
+            pm.getLaunchIntentForPackage(info.activityInfo.packageName)?.let { 
+                startActivity(it)
+                findNavController().popBackStack(R.id.mainFragment, false)
+            }
         }
     }
 
