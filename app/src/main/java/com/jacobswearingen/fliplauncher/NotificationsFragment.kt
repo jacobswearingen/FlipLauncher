@@ -10,13 +10,12 @@ import android.view.ViewGroup
 import android.widget.*
 import androidx.fragment.app.Fragment
 
-class NotificationsFragment : Fragment(R.layout.fragment_notifications),
-    KeyEventHandler {
+class NotificationsFragment : Fragment(R.layout.fragment_notifications), KeyEventHandler {
 
     private var selectedNotificationIndex = 0
     private lateinit var listView: ListView
     private lateinit var adapter: NotificationAdapter
-    private var notifications: MutableList<StatusBarNotification> = mutableListOf()
+    private val notifications = mutableListOf<StatusBarNotification>()
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
@@ -26,8 +25,6 @@ class NotificationsFragment : Fragment(R.layout.fragment_notifications),
         refreshNotifications()
         setupListViewListeners()
     }
-
-    // No longer need to remove listener
 
     private fun refreshNotifications() {
         notifications.clear()
@@ -47,7 +44,7 @@ class NotificationsFragment : Fragment(R.layout.fragment_notifications),
             if (intent != null) {
                 try {
                     intent.send()
-                    navController.popBackStack() // Go back to main fragment
+                    navController.popBackStack()
                 } catch (e: Exception) {
                     Toast.makeText(requireContext(), "Cannot perform action", Toast.LENGTH_SHORT).show()
                 }
@@ -55,7 +52,7 @@ class NotificationsFragment : Fragment(R.layout.fragment_notifications),
                 requireContext().packageManager.getLaunchIntentForPackage(sbn.packageName)
                     ?.let {
                         startActivity(it)
-                        navController.popBackStack() // Go back to main fragment
+                        navController.popBackStack()
                     }
                     ?: Toast.makeText(requireContext(), "Cannot launch app", Toast.LENGTH_SHORT).show()
             }
@@ -77,7 +74,6 @@ class NotificationsFragment : Fragment(R.layout.fragment_notifications),
                     val key = notifications[position].key
                     if (key != null) {
                         NotificationService.cancelNotificationByKey(key)
-                        // UI will update via refreshNotifications()
                         refreshNotifications()
                     }
                 }
@@ -92,7 +88,7 @@ class NotificationsFragment : Fragment(R.layout.fragment_notifications),
         return false
     }
 
-    inner class NotificationAdapter : BaseAdapter() {
+    private inner class NotificationAdapter : BaseAdapter() {
         override fun getCount() = notifications.size
         override fun getItem(position: Int) = notifications[position]
         override fun getItemId(position: Int) = position.toLong()
@@ -101,7 +97,6 @@ class NotificationsFragment : Fragment(R.layout.fragment_notifications),
                 .inflate(R.layout.item_notification_list, parent, false)
             val sbn = getItem(position)
 
-            // Set app icon
             v.findViewById<ImageView>(R.id.appIcon).apply {
                 try {
                     setImageDrawable(requireContext().packageManager.getApplicationIcon(sbn.packageName))
@@ -110,12 +105,11 @@ class NotificationsFragment : Fragment(R.layout.fragment_notifications),
                 }
             }
 
-            // Use Notification.extras for title and text
-            val extras = sbn.notification.extras
-            val title = extras.getCharSequence(Notification.EXTRA_TITLE)?.toString() ?: ""
-            val text = extras.getCharSequence(Notification.EXTRA_TEXT)?.toString() ?: ""
-
-            v.findViewById<TextView>(R.id.notificationText).text = "$title: $text"
+            with(sbn.notification.extras) {
+                val title = getCharSequence(Notification.EXTRA_TITLE)?.toString() ?: ""
+                val text = getCharSequence(Notification.EXTRA_TEXT)?.toString() ?: ""
+                v.findViewById<TextView>(R.id.notificationText).text = "$title: $text"
+            }
             return v
         }
     }
