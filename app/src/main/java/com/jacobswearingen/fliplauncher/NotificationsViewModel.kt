@@ -30,7 +30,8 @@ class NotificationsViewModel(application: Application) : AndroidViewModel(applic
     private fun loadNotifications() {
         viewModelScope.launch(Dispatchers.Default) {
             val sorted = NotificationService.getActiveNotifications()
-                .sortedByDescending { it.postTime }
+                .sortedWith(compareByDescending<StatusBarNotification> { it.notification.priority }
+                    .thenByDescending { it.postTime })
             _notifications.postValue(sorted)
         }
     }
