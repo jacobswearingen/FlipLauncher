@@ -28,7 +28,10 @@ class NotificationsFragment : Fragment(R.layout.fragment_notifications), KeyEven
 
     private fun refreshNotifications() {
         notifications.clear()
-        notifications.addAll(NotificationService.getActiveNotifications())
+        notifications.addAll(
+            NotificationService.getActiveNotifications()
+                .sortedByDescending { it.postTime }
+        )
         adapter.notifyDataSetChanged()
         if (notifications.isNotEmpty()) {
             selectedNotificationIndex = selectedNotificationIndex.coerceAtMost(notifications.size - 1)
@@ -110,6 +113,17 @@ class NotificationsFragment : Fragment(R.layout.fragment_notifications), KeyEven
                 val text = getCharSequence(Notification.EXTRA_TEXT)?.toString() ?: ""
                 v.findViewById<TextView>(R.id.notificationText).text = "$title: $text"
             }
+
+            // Format and show timestamp in 12-hour format (e.g., 3:45 PM)
+            val timestampView = v.findViewById<TextView>(R.id.notificationTimestamp)
+            val relativeTime = android.text.format.DateUtils.getRelativeTimeSpanString(
+                sbn.postTime,
+                System.currentTimeMillis(),
+                android.text.format.DateUtils.MINUTE_IN_MILLIS,
+                android.text.format.DateUtils.FORMAT_ABBREV_RELATIVE
+            )
+            timestampView.text = relativeTime
+
             return v
         }
     }
