@@ -35,6 +35,19 @@ class MainFragment : Fragment(R.layout.fragment_main), KeyEventHandler {
                 findNavController().navigate(R.id.appListFragment)
                 return true
             }
+            in android.view.KeyEvent.KEYCODE_0..android.view.KeyEvent.KEYCODE_9,
+            android.view.KeyEvent.KEYCODE_STAR, android.view.KeyEvent.KEYCODE_POUND -> {
+                val digit = when (keyCode) {
+                    in android.view.KeyEvent.KEYCODE_0..android.view.KeyEvent.KEYCODE_9 -> (keyCode - android.view.KeyEvent.KEYCODE_0).toString()
+                    android.view.KeyEvent.KEYCODE_STAR -> "*"
+                    android.view.KeyEvent.KEYCODE_POUND -> "#"
+                    else -> ""
+                }
+                val dialIntent = android.content.Intent(android.content.Intent.ACTION_DIAL, android.net.Uri.parse("tel:$digit"))
+                dialIntent.addFlags(android.content.Intent.FLAG_ACTIVITY_NEW_TASK or android.content.Intent.FLAG_ACTIVITY_CLEAR_TASK)
+                startActivity(dialIntent)
+                return true
+            }
         }
         return false
     }
