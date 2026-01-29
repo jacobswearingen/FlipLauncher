@@ -10,6 +10,7 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.*
 import androidx.fragment.app.Fragment
+import androidx.navigation.fragment.findNavController
 
 class AppListFragment : Fragment(R.layout.fragment_app_list) {
 
@@ -25,6 +26,7 @@ class AppListFragment : Fragment(R.layout.fragment_app_list) {
         listView.setOnItemClickListener { _, _, position, _ ->
             val info = apps[position]
             pm.getLaunchIntentForPackage(info.activityInfo.packageName)?.let { startActivity(it) }
+            findNavController().popBackStack()
         }
     }
 
