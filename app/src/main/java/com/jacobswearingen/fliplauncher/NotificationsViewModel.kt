@@ -9,6 +9,7 @@ import androidx.lifecycle.viewModelScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 
+@Suppress("DEPRECATION")
 class NotificationsViewModel(application: Application) : AndroidViewModel(application), NotificationService.Companion.NotificationListener {
     private val _notifications = MutableLiveData<List<StatusBarNotification>>()
     val notifications: LiveData<List<StatusBarNotification>> = _notifications
