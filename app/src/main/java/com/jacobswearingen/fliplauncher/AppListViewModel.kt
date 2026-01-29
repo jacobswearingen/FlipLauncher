@@ -16,8 +16,13 @@ class AppListViewModel(application: Application) : AndroidViewModel(application)
     private val _apps = MutableLiveData<List<ResolveInfo>>()
     val apps: LiveData<List<ResolveInfo>> = _apps
 
-    fun loadApps(pm: PackageManager) {
+    init {
+        loadApps()
+    }
+
+    private fun loadApps() {
         viewModelScope.launch(Dispatchers.IO) {
+            val pm = getApplication<Application>().packageManager
             val intent = Intent(Intent.ACTION_MAIN).apply { addCategory(Intent.CATEGORY_LAUNCHER) }
             val result = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
                 pm.queryIntentActivities(intent, PackageManager.ResolveInfoFlags.of(0))

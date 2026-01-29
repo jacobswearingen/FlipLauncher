@@ -9,55 +9,80 @@ import android.widget.TextView
 import android.widget.ImageView
 import android.widget.ListView
 import androidx.fragment.app.Fragment
-import androidx.lifecycle.ViewModelProvider
+import androidx.fragment.app.viewModels
 import androidx.navigation.fragment.findNavController
 
 class AppListFragment : Fragment(R.layout.fragment_app_list) {
 
-    private val pm by lazy { requireContext().packageManager }
-    private lateinit var viewModel: AppListViewModel
-    private var apps: List<android.content.pm.ResolveInfo> = emptyList()
+    private val viewModel: AppListViewModel by viewModels()
     private lateinit var adapter: AppListAdapter
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-        viewModel = ViewModelProvider(this, ViewModelProvider.AndroidViewModelFactory.getInstance(requireActivity().application))[AppListViewModel::class.java]
         val listView = view.findViewById<ListView>(R.id.appList)
-        adapter = AppListAdapter()
+        val pm = requireContext().packageManager
+        adapter = AppListAdapter(pm)
         listView.adapter = adapter
+
+        viewModel.apps.observe(viewLifecycleOwner) { loadedApps ->
+            adapter.submitList(loadedApps)
+        }
+
         listView.setOnItemClickListener { _, _, position, _ ->
-            val info = apps[position]
+            val info = adapter.getItem(position)
             pm.getLaunchIntentForPackage(info.activityInfo.packageName)?.let {
                 startActivity(it)
                 findNavController().popBackStack(R.id.mainFragment, false)
             }
         }
-        viewModel.apps.observe(viewLifecycleOwner) { loadedApps ->
-            apps = loadedApps
-            adapter.notifyDataSetChanged()
-        }
-        viewModel.loadApps(pm)
     }
 
-    private inner class AppListAdapter : BaseAdapter() {
+    private inner class AppListAdapter(
+        private val pm: android.content.pm.PackageManager
+    ) : BaseAdapter() {
+        private var apps: List<android.content.pm.ResolveInfo> = emptyList()
         private val defaultIcon by lazy {
             requireContext().getDrawable(android.R.drawable.sym_def_app_icon)
+        }
+
+        fun submitList(newApps: List<android.content.pm.ResolveInfo>) {
+            apps = newApps
+            notifyDataSetChanged()
         }
 
         override fun getCount() = apps.size
         override fun getItem(position: Int) = apps[position]
         override fun getItemId(position: Int) = position.toLong()
         override fun getView(position: Int, convertView: View?, parent: ViewGroup?): View {
+            val holder: ViewHolder
+            val view: View
+
+            if (convertView == null) {
+                view = LayoutInflater.from(parent?.context).inflate(R.layout.item_app_list, parent, false)
+                holder = ViewHolder(
+                    view.findViewById(R.id.appLabel),
+                    view.findViewById(R.id.appIcon)
+                )
+                view.tag = holder
+            } else {
+                view = convertView
+                holder = view.tag as ViewHolder
+            }
+
             val info = apps[position]
-            val v = convertView ?: LayoutInflater.from(parent?.context).inflate(R.layout.item_app_list, parent, false)
-            v.findViewById<TextView>(R.id.appLabel).text = info.loadLabel(pm)
+            holder.label.text = info.loadLabel(pm)
             val icon = try {
                 info.loadIcon(pm)
             } catch (_: Exception) {
                 defaultIcon
             }
-            v.findViewById<ImageView>(R.id.appIcon).setImageDrawable(icon)
-            return v
+            holder.icon.setImageDrawable(icon)
+            return view
         }
     }
+
+    private data class ViewHolder(
+        val label: TextView,
+        val icon: ImageView
+    )
 }
