@@ -8,6 +8,11 @@ class NotificationService : NotificationListenerService() {
     companion object {
         private var instance: NotificationService? = null
 
+        @JvmStatic
+        fun getActiveNotifications(): List<StatusBarNotification> {
+            return instance?.activeNotifications?.toList() ?: emptyList()
+        }
+
         fun cancelNotificationByKey(key: String) {
             val service = instance ?: return
             val sbn = service.activeNotifications?.find { it.key == key }
@@ -42,24 +47,4 @@ class NotificationService : NotificationListenerService() {
         if (instance == this) instance = null
     }
 
-    override fun onNotificationPosted(sbn: StatusBarNotification) {
-        val title = sbn.notification.extras.getString("android.title") ?: ""
-        val text = sbn.notification.extras.getString("android.text") ?: ""
-        val packageName = sbn.packageName
-        NotificationData.addNotification(sbn.key, "$title: $text", packageName)
-    }
-
-    override fun onNotificationRemoved(sbn: StatusBarNotification) {
-        NotificationData.removeNotification(sbn.key)
-    }
-
-    override fun onListenerConnected() {
-        super.onListenerConnected()
-        activeNotifications?.forEach { sbn ->
-            val title = sbn.notification.extras.getString("android.title") ?: ""
-            val text = sbn.notification.extras.getString("android.text") ?: ""
-            val packageName = sbn.packageName
-            NotificationData.addNotification(sbn.key, "$title: $text", packageName)
-        }
-    }
 }
