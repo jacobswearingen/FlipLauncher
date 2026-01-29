@@ -1,42 +1,32 @@
 package com.jacobswearingen.fliplauncher
 
-import android.content.Intent
-import android.content.pm.PackageManager
-import android.content.pm.ResolveInfo
-import android.os.Build
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.*
 import androidx.fragment.app.Fragment
+import androidx.lifecycle.ViewModelProvider
 import androidx.navigation.fragment.findNavController
 
 class AppListFragment : Fragment(R.layout.fragment_app_list) {
 
     private val pm by lazy { requireContext().packageManager }
+    private lateinit var viewModel: AppListViewModel
     private val apps by lazy {
-        getInstalledApps(pm).sortedBy { it.loadLabel(pm).toString().lowercase() }
+        viewModel.getApps(pm).sortedBy { it.loadLabel(pm).toString().lowercase() }
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
+        viewModel = ViewModelProvider(this, ViewModelProvider.AndroidViewModelFactory.getInstance(requireActivity().application))
+            .get(AppListViewModel::class.java)
         val listView = view.findViewById<ListView>(R.id.appList)
         listView.adapter = AppListAdapter()
         listView.setOnItemClickListener { _, _, position, _ ->
             val info = apps[position]
             pm.getLaunchIntentForPackage(info.activityInfo.packageName)?.let { startActivity(it) }
             findNavController().popBackStack()
-        }
-    }
-
-    private fun getInstalledApps(pm: PackageManager): List<ResolveInfo> {
-        val intent = Intent(Intent.ACTION_MAIN).apply { addCategory(Intent.CATEGORY_LAUNCHER) }
-        return if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
-            pm.queryIntentActivities(intent, PackageManager.ResolveInfoFlags.of(0))
-        } else {
-            @Suppress("DEPRECATION")
-            pm.queryIntentActivities(intent, 0)
         }
     }
 
