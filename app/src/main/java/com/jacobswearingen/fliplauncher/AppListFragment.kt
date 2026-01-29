@@ -13,48 +13,50 @@ import androidx.fragment.app.Fragment
 
 class AppListFragment : Fragment(R.layout.fragment_app_list) {
 
+    private val pm by lazy { requireContext().packageManager }
+    private val apps by lazy {
+        getInstalledApps(pm).sortedBy { it.loadLabel(pm).toString().lowercase() }
+    }
+
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-        val pm = requireContext().packageManager
-        val apps = getInstalledApps(pm).sortedBy {
-            it.loadLabel(pm).toString().lowercase()
-        }
         val listView = view.findViewById<ListView>(R.id.appList)
-        val adapter = object : BaseAdapter() {
-            override fun getCount() = apps.size
-            override fun getItem(position: Int) = apps[position]
-            override fun getItemId(position: Int) = position.toLong()
-            override fun getView(position: Int, convertView: View?, parent: ViewGroup?): View {
-                val info = apps[position]
-                val v = convertView ?: LayoutInflater.from(parent?.context ?: requireContext())
-                    .inflate(R.layout.item_app_list, parent, false)
-                val labelView = v.findViewById<TextView>(R.id.appLabel)
-                labelView.text = info.loadLabel(pm)
-                val iconView = v.findViewById<ImageView>(R.id.appIcon)
-                val icon = try {
-                    info.loadIcon(pm)
-                } catch (_: Exception) {
-                    requireContext().getDrawable(android.R.drawable.sym_def_app_icon)
-                }
-                iconView.setImageDrawable(icon)
-                return v
-            }
-        }
-        listView.adapter = adapter
+        listView.adapter = AppListAdapter()
         listView.setOnItemClickListener { _, _, position, _ ->
             val info = apps[position]
-            requireContext().packageManager.getLaunchIntentForPackage(info.activityInfo.packageName)
-                ?.let { startActivity(it) }
+            pm.getLaunchIntentForPackage(info.activityInfo.packageName)?.let { startActivity(it) }
         }
     }
 
     private fun getInstalledApps(pm: PackageManager): List<ResolveInfo> {
-        val intent = Intent(Intent.ACTION_MAIN, null).apply { addCategory(Intent.CATEGORY_LAUNCHER) }
+        val intent = Intent(Intent.ACTION_MAIN).apply { addCategory(Intent.CATEGORY_LAUNCHER) }
         return if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
             pm.queryIntentActivities(intent, PackageManager.ResolveInfoFlags.of(0))
         } else {
             @Suppress("DEPRECATION")
             pm.queryIntentActivities(intent, 0)
+        }
+    }
+
+    private inner class AppListAdapter : BaseAdapter() {
+        private val defaultIcon by lazy {
+            requireContext().getDrawable(android.R.drawable.sym_def_app_icon)
+        }
+
+        override fun getCount() = apps.size
+        override fun getItem(position: Int) = apps[position]
+        override fun getItemId(position: Int) = position.toLong()
+        override fun getView(position: Int, convertView: View?, parent: ViewGroup?): View {
+            val info = apps[position]
+            val v = convertView ?: LayoutInflater.from(parent?.context).inflate(R.layout.item_app_list, parent, false)
+            v.findViewById<TextView>(R.id.appLabel).text = info.loadLabel(pm)
+            val icon = try {
+                info.loadIcon(pm)
+            } catch (_: Exception) {
+                defaultIcon
+            }
+            v.findViewById<ImageView>(R.id.appIcon).setImageDrawable(icon)
+            return v
         }
     }
 }
