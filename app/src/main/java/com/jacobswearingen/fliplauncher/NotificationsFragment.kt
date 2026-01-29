@@ -9,39 +9,35 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.*
 import androidx.fragment.app.Fragment
+import androidx.fragment.app.viewModels
+import android.graphics.drawable.Drawable
+
 
 class NotificationsFragment : Fragment(R.layout.fragment_notifications), KeyEventHandler {
-
     private var selectedNotificationIndex = 0
     private lateinit var listView: ListView
     private lateinit var adapter: NotificationAdapter
-    private val notifications = mutableListOf<StatusBarNotification>()
+    private val viewModel: NotificationsViewModel by viewModels()
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         listView = view.findViewById(R.id.notificationList)
         adapter = NotificationAdapter()
         listView.adapter = adapter
-        refreshNotifications()
-        setupListViewListeners()
-    }
 
-    private fun refreshNotifications() {
-        notifications.clear()
-        notifications.addAll(
-            NotificationService.getActiveNotifications()
-                .sortedByDescending { it.postTime }
-        )
-        adapter.notifyDataSetChanged()
-        if (notifications.isNotEmpty()) {
-            selectedNotificationIndex = selectedNotificationIndex.coerceAtMost(notifications.size - 1)
-            listView.setSelection(selectedNotificationIndex)
+        viewModel.notifications.observe(viewLifecycleOwner) { loadedNotifications ->
+            adapter.submitList(loadedNotifications)
+            if (loadedNotifications.isNotEmpty()) {
+                selectedNotificationIndex = selectedNotificationIndex.coerceAtMost(loadedNotifications.size - 1)
+                listView.setSelection(selectedNotificationIndex)
+            }
         }
+        setupListViewListeners()
     }
 
     private fun setupListViewListeners() {
         listView.setOnItemClickListener { _, _, position, _ ->
-            val sbn = notifications[position]
+            val sbn = adapter.getItem(position)
             val intent = sbn.notification.contentIntent
             val navController = findNavController()
             if (intent != null) {
@@ -73,18 +69,15 @@ class NotificationsFragment : Fragment(R.layout.fragment_notifications), KeyEven
         when (keyCode) {
             android.view.KeyEvent.KEYCODE_SOFT_LEFT, 139 -> {
                 val position = listView.selectedItemPosition
-                if (position in notifications.indices) {
-                    val key = notifications[position].key
-                    if (key != null) {
-                        NotificationService.cancelNotificationByKey(key)
-                        refreshNotifications()
-                    }
+                val sbn = adapter.getItemOrNull(position)
+                val key = sbn?.key
+                if (key != null) {
+                    viewModel.cancelNotification(key)
                 }
                 return true
             }
             android.view.KeyEvent.KEYCODE_SOFT_RIGHT, 48 -> {
-                NotificationService.clearAllSystemNotifications()
-                refreshNotifications()
+                viewModel.clearAllNotifications()
                 return true
             }
         }
@@ -92,8 +85,18 @@ class NotificationsFragment : Fragment(R.layout.fragment_notifications), KeyEven
     }
 
     private inner class NotificationAdapter : BaseAdapter() {
-        override fun getCount() = notifications.size
-        override fun getItem(position: Int) = notifications[position]
+        private var items: List<StatusBarNotification> = emptyList()
+
+        fun submitList(newList: List<StatusBarNotification>) {
+            items = newList
+            notifyDataSetChanged()
+        }
+
+        fun getItemOrNull(position: Int): StatusBarNotification? =
+            if (position in items.indices) items[position] else null
+
+        override fun getCount() = items.size
+        override fun getItem(position: Int) = items[position]
         override fun getItemId(position: Int) = position.toLong()
         override fun getView(position: Int, convertView: View?, parent: ViewGroup?): View {
             val v = convertView ?: LayoutInflater.from(parent?.context ?: requireContext())
@@ -114,7 +117,6 @@ class NotificationsFragment : Fragment(R.layout.fragment_notifications), KeyEven
                 v.findViewById<TextView>(R.id.notificationText).text = "$title: $text"
             }
 
-            // Format and show timestamp in 12-hour format (e.g., 3:45 PM)
             v.findViewById<TextView>(R.id.notificationTimestamp).text =
                 android.text.format.DateUtils.getRelativeTimeSpanString(
                     sbn.postTime,
@@ -126,4 +128,9 @@ class NotificationsFragment : Fragment(R.layout.fragment_notifications), KeyEven
             return v
         }
     }
+    private data class ViewHolder(
+        val appIcon: ImageView,
+        val notificationText: TextView,
+        val notificationTimestamp: TextView
+    )
 }

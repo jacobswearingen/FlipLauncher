@@ -8,6 +8,23 @@ class NotificationService : NotificationListenerService() {
     companion object {
         private var instance: NotificationService? = null
 
+        interface NotificationListener {
+            fun onNotificationsChanged()
+        }
+        private val listeners = mutableSetOf<NotificationListener>()
+
+        fun registerListener(listener: NotificationListener) {
+            listeners.add(listener)
+        }
+
+        fun unregisterListener(listener: NotificationListener) {
+            listeners.remove(listener)
+        }
+
+        private fun notifyListeners() {
+            listeners.forEach { it.onNotificationsChanged() }
+        }
+
         @JvmStatic
         fun getActiveNotifications(): List<StatusBarNotification> {
             return instance?.activeNotifications?.toList() ?: emptyList()
@@ -47,4 +64,13 @@ class NotificationService : NotificationListenerService() {
         if (instance == this) instance = null
     }
 
+    override fun onNotificationPosted(sbn: StatusBarNotification?) {
+        super.onNotificationPosted(sbn)
+        notifyListeners()
+    }
+
+    override fun onNotificationRemoved(sbn: StatusBarNotification?) {
+        super.onNotificationRemoved(sbn)
+        notifyListeners()
+    }
 }
