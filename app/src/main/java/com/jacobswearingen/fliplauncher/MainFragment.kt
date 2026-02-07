@@ -16,6 +16,10 @@ import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 
 class MainFragment : Fragment(R.layout.fragment_main), KeyEventHandler {
+    override fun onResume() {
+        super.onResume()
+        view?.let { updateTimeViews(it) }
+    }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
