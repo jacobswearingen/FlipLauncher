@@ -9,6 +9,11 @@ import java.text.SimpleDateFormat
 import java.util.Date
 import java.util.Locale
 import androidx.navigation.fragment.findNavController
+import androidx.lifecycle.lifecycleScope
+import androidx.lifecycle.Lifecycle
+import androidx.lifecycle.repeatOnLifecycle
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.launch
 
 class MainFragment : Fragment(R.layout.fragment_main), KeyEventHandler {
 
@@ -16,13 +21,24 @@ class MainFragment : Fragment(R.layout.fragment_main), KeyEventHandler {
         super.onViewCreated(view, savedInstanceState)
         AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_YES)
         updateTimeViews(view)
+        viewLifecycleOwner.lifecycleScope.launch {
+            viewLifecycleOwner.lifecycle.repeatOnLifecycle(Lifecycle.State.STARTED) {
+                while (true) {
+                    val now = java.util.Calendar.getInstance()
+                    val msUntilNextMinute =
+                        (60 - now.get(java.util.Calendar.SECOND)) * 1000 - now.get(java.util.Calendar.MILLISECOND)
+                    delay(msUntilNextMinute.toLong())
+                    updateTimeViews(view)
+                }
+            }
+        }
     }
 
     private fun updateTimeViews(view: View) = with(view) {
         val now = Date()
-        findViewById<TextView>(R.id.textViewTime).text = SimpleDateFormat("h:mm", Locale.getDefault()).format(now)
-        findViewById<TextView>(R.id.textViewAmPm).text = SimpleDateFormat("a", Locale.getDefault()).format(now)
-        findViewById<TextView>(R.id.textViewDate).text = SimpleDateFormat("EEE, MMM d", Locale.getDefault()).format(now)
+        findViewById<TextView>(R.id.textViewTime)?.text = SimpleDateFormat("h:mm", Locale.getDefault()).format(now)
+        findViewById<TextView>(R.id.textViewAmPm)?.text = SimpleDateFormat("a", Locale.getDefault()).format(now)
+        findViewById<TextView>(R.id.textViewDate)?.text = SimpleDateFormat("EEE, MMM d", Locale.getDefault()).format(now)
     }
 
     override fun onKeyDown(keyCode: Int, event: android.view.KeyEvent?): Boolean {
