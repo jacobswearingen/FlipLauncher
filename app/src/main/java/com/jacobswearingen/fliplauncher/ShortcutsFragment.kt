@@ -10,87 +10,61 @@ import androidx.fragment.app.Fragment
 import com.jacobswearingen.fliplauncher.R
 
 class ShortcutsFragment : Fragment(R.layout.fragment_shortcuts) {
-    private data class ShortcutIcon(
-        val viewId: Int,
-        val enabledRes: Int,
-        val disabledRes: Int,
-        val isEnabled: () -> Boolean,
-        val onClickIntent: Intent
-    )
-
-    private val icons by lazy {
-        return@lazy listOf(
-            ShortcutIcon(
-                R.id.iconWifi,
-                R.drawable.wifi_enabled,
-                R.drawable.wifi_disabled,
-                { isWifiEnabled() },
-                Intent(Settings.ACTION_WIFI_SETTINGS)
-            ),
-            ShortcutIcon(
-                R.id.iconBluetooth,
-                R.drawable.bluetooth_enabled,
-                R.drawable.bluetooth_disabled,
-                { isBluetoothEnabled() },
-                Intent(Settings.ACTION_BLUETOOTH_SETTINGS)
-            ),
-            ShortcutIcon(
-                R.id.iconCellular,
-                R.drawable.cell_data,
-                R.drawable.cell_data, // same icon, just color changes
-                { isCellularDataEnabled() },
-                Intent(Settings.ACTION_DATA_ROAMING_SETTINGS)
-            ),
-            ShortcutIcon(
-                R.id.iconAirplane,
-                R.drawable.airplanemode_active,
-                R.drawable.airplanemode_active, // same icon, just color changes
-                { isAirplaneModeOn() },
-                Intent(Settings.ACTION_AIRPLANE_MODE_SETTINGS)
-            )
-        )
-    }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-        icons.forEach { icon ->
-            val imageView = view.findViewById<android.widget.ImageView>(icon.viewId)
-            imageView?.setOnClickListener { startActivity(icon.onClickIntent) }
-        }
-        updateAllIcons(view)
+
+        setupShortcut(view, R.id.itemWifi, R.drawable.wifi_enabled, R.drawable.wifi_disabled, "Wi-Fi", Intent(Settings.ACTION_WIFI_SETTINGS)) { isWifiEnabled() }
+        setupShortcut(view, R.id.itemBluetooth, R.drawable.bluetooth_enabled, R.drawable.bluetooth_disabled, "Bluetooth", Intent(Settings.ACTION_BLUETOOTH_SETTINGS)) { isBluetoothEnabled() }
+        setupShortcut(view, R.id.itemCellular, R.drawable.cell_data, R.drawable.cell_data, "Cellular Data", Intent(Settings.ACTION_DATA_ROAMING_SETTINGS)) { isCellularDataEnabled() }
+        setupShortcut(view, R.id.itemAirplane, R.drawable.airplanemode_active, R.drawable.airplanemode_inactive, "Airplane Mode", Intent(Settings.ACTION_AIRPLANE_MODE_SETTINGS)) { isAirplaneModeOn() }
     }
 
     override fun onResume() {
         super.onResume()
-        view?.let { updateAllIcons(it) }
-    }
-
-    private fun updateAllIcons(view: View) {
-        icons.forEach { icon ->
-            val imageView = view.findViewById<android.widget.ImageView>(icon.viewId)
-            updateIcon(imageView, icon.enabledRes, icon.disabledRes, icon.isEnabled())
+        view?.let {
+            updateShortcut(it, R.id.itemWifi, R.drawable.wifi_enabled, R.drawable.wifi_disabled) { isWifiEnabled() }
+            updateShortcut(it, R.id.itemBluetooth, R.drawable.bluetooth_enabled, R.drawable.bluetooth_disabled) { isBluetoothEnabled() }
+            updateShortcut(it, R.id.itemCellular, R.drawable.cell_data, R.drawable.cell_data) { isCellularDataEnabled() }
+            updateShortcut(it, R.id.itemAirplane, R.drawable.airplanemode_active, R.drawable.airplanemode_inactive) { isAirplaneModeOn() }
         }
     }
 
-    private fun updateIcon(
-        imageView: android.widget.ImageView?,
+    private fun setupShortcut(
+        parent: View,
+        itemId: Int,
         enabledRes: Int,
         disabledRes: Int,
-        enabled: Boolean
+        label: String,
+        intent: Intent,
+        isEnabled: () -> Boolean
     ) {
-        imageView?.let {
-            val (iconRes, color) = if (enabled) {
-                enabledRes to "#2196F3"
-            } else {
-                disabledRes to "#BDBDBD"
-            }
-            it.setImageResource(iconRes)
-            val bg = android.graphics.drawable.GradientDrawable().apply {
-                shape = android.graphics.drawable.GradientDrawable.OVAL
-                setColor(android.graphics.Color.parseColor(color))
-            }
-            it.background = bg
+        val item = parent.findViewById<View>(itemId)
+        val icon = item.findViewById<android.widget.ImageView>(R.id.shortcutIcon)
+        val text = item.findViewById<android.widget.TextView>(R.id.shortcutLabel)
+        text.text = label
+        item.setOnClickListener { parent.context.startActivity(intent) }
+        updateShortcut(parent, itemId, enabledRes, disabledRes, isEnabled)
+    }
+
+    private fun updateShortcut(
+        parent: View,
+        itemId: Int,
+        enabledRes: Int,
+        disabledRes: Int,
+        isEnabled: () -> Boolean
+    ) {
+        val item = parent.findViewById<View>(itemId)
+        val icon = item.findViewById<android.widget.ImageView>(R.id.shortcutIcon)
+        val enabled = isEnabled()
+        val iconRes = if (enabled) enabledRes else disabledRes
+        val color = if (enabled) "#2196F3" else "#BDBDBD"
+        icon.setImageResource(iconRes)
+        val bg = android.graphics.drawable.GradientDrawable().apply {
+            shape = android.graphics.drawable.GradientDrawable.OVAL
+            setColor(android.graphics.Color.parseColor(color))
         }
+        icon.background = bg
     }
 
     private fun isWifiEnabled(): Boolean {

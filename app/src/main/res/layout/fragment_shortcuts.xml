@@ -5,91 +5,64 @@
     android:padding="8dp"
     android:alignmentMode="alignMargins"
     android:rowCount="2"
-    android:columnCount="4"
+    android:columnCount="3"
     android:useDefaultMargins="true"
-    android:gravity="center">
+    android:gravity="bottom">
 
 
-    <ImageView
-        android:id="@+id/iconWifi"
-        style="@style/ShortcutIconBase"
+    <include
+        layout="@layout/shortcut_item"
+        android:id="@+id/itemWifi"
         android:layout_row="0"
         android:layout_column="0"
         android:layout_width="0dp"
-        android:layout_height="wrap_content"
-        android:layout_columnWeight="1"
-        android:src="@drawable/wifi_enabled"
-        android:contentDescription="Wi-Fi state" />
-    <TextView
-        android:id="@+id/labelWifi"
+        android:layout_height="0dp"
+        android:layout_rowWeight="1"
+        android:layout_columnWeight="1" />
+    <include
+        layout="@layout/shortcut_item"
+        android:id="@+id/itemBluetooth"
+        android:layout_row="0"
+        android:layout_column="1"
+        android:layout_width="0dp"
+        android:layout_height="0dp"
+        android:layout_rowWeight="1"
+        android:layout_columnWeight="1" />
+    <include
+        layout="@layout/shortcut_item"
+        android:id="@+id/itemCellular"
+        android:layout_row="0"
+        android:layout_column="2"
+        android:layout_width="0dp"
+        android:layout_height="0dp"
+        android:layout_rowWeight="1"
+        android:layout_columnWeight="1" />
+    <include
+        layout="@layout/shortcut_item"
+        android:id="@+id/itemAirplane"
         android:layout_row="1"
         android:layout_column="0"
         android:layout_width="0dp"
-        android:layout_height="wrap_content"
-        android:layout_columnWeight="1"
-        android:text="Wi-Fi"
-        android:gravity="center"
-        android:textAppearance="?android:attr/textAppearanceSmall" />
-    <ImageView
-        android:id="@+id/iconBluetooth"
-        style="@style/ShortcutIconBase"
-        android:layout_row="0"
-        android:layout_column="1"
-        android:layout_width="0dp"
-        android:layout_height="wrap_content"
-        android:layout_columnWeight="1"
-        android:src="@drawable/bluetooth_enabled"
-        android:contentDescription="Bluetooth state" />
-    <TextView
-        android:id="@+id/labelBluetooth"
+        android:layout_height="0dp"
+        android:layout_rowWeight="1"
+        android:layout_columnWeight="1" />
+    <include
+        layout="@layout/shortcut_item"
+        android:id="@+id/itemExtra1"
         android:layout_row="1"
         android:layout_column="1"
         android:layout_width="0dp"
-        android:layout_height="wrap_content"
-        android:layout_columnWeight="1"
-        android:text="Bluetooth"
-        android:gravity="center"
-        android:textAppearance="?android:attr/textAppearanceSmall" />
-    <ImageView
-        android:id="@+id/iconCellular"
-        style="@style/ShortcutIconBase"
-        android:layout_row="0"
-        android:layout_column="2"
-        android:layout_width="0dp"
-        android:layout_height="wrap_content"
-        android:layout_columnWeight="1"
-        android:src="@drawable/cell_data"
-        android:contentDescription="Cellular state" />
-    <TextView
-        android:id="@+id/labelCellular"
+        android:layout_height="0dp"
+        android:layout_rowWeight="1"
+        android:layout_columnWeight="1" />
+    <include
+        layout="@layout/shortcut_item"
+        android:id="@+id/itemExtra2"
         android:layout_row="1"
         android:layout_column="2"
         android:layout_width="0dp"
-        android:layout_height="wrap_content"
-        android:layout_columnWeight="1"
-        android:text="Cellular Data"
-        android:gravity="center"
-        android:textAppearance="?android:attr/textAppearanceSmall" />
-
-    <ImageView
-        android:id="@+id/iconAirplane"
-        style="@style/ShortcutIconBase"
-        android:layout_row="0"
-        android:layout_column="3"
-        android:layout_width="0dp"
-        android:layout_height="wrap_content"
-        android:layout_columnWeight="1"
-        android:src="@drawable/airplanemode_active"
-        android:contentDescription="Airplane mode state" />
-    <TextView
-        android:id="@+id/labelAirplane"
-        android:layout_row="1"
-        android:layout_column="3"
-        android:layout_width="0dp"
-        android:layout_height="wrap_content"
-        android:layout_columnWeight="1"
-        android:text="Airplane Mode"
-        android:gravity="center"
-        android:textAppearance="?android:attr/textAppearanceSmall" />
+        android:layout_height="0dp"
+        android:layout_rowWeight="1"
+        android:layout_columnWeight="1" />
 
 </GridLayout>
