@@ -51,6 +51,10 @@ class MainFragment : Fragment(R.layout.fragment_main), KeyEventHandler {
                 findNavController().navigate(R.id.notificationsFragment)
                 return true
             }
+            android.view.KeyEvent.KEYCODE_SOFT_RIGHT, 142 -> {
+                findNavController().navigate(R.id.shortcutsFragment)
+                return true
+            }
             android.view.KeyEvent.KEYCODE_DPAD_CENTER, 28 -> {
                 findNavController().navigate(R.id.appListFragment)
                 return true

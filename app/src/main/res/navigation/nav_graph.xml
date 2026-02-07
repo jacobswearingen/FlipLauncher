@@ -15,4 +15,8 @@
         android:id="@+id/appListFragment"
         android:name="com.jacobswearingen.fliplauncher.AppListFragment"
         android:label="Apps" />
+    <fragment
+        android:id="@+id/shortcutsFragment"
+        android:name="com.jacobswearingen.fliplauncher.ShortcutsFragment"
+        android:label="Shortcuts" />
 </navigation>
