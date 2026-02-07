@@ -1,139 +1,95 @@
 package com.jacobswearingen.fliplauncher
 
-
 import android.content.Context
 import android.content.Intent
 import android.net.wifi.WifiManager
 import android.os.Bundle
 import android.provider.Settings
-import android.view.LayoutInflater
 import android.view.View
-import android.view.ViewGroup
-import android.widget.CompoundButton
-import android.widget.Switch
-import androidx.core.content.ContextCompat.getSystemService
 import androidx.fragment.app.Fragment
-import android.bluetooth.BluetoothAdapter
-import android.widget.Toast
 import com.jacobswearingen.fliplauncher.R
 
 class ShortcutsFragment : Fragment(R.layout.fragment_shortcuts) {
-    private var wifiIcon: android.widget.ImageView? = null
-    private var bluetoothIcon: android.widget.ImageView? = null
-    private var cellularIcon: android.widget.ImageView? = null
-    private var airplaneIcon: android.widget.ImageView? = null
+    private data class ShortcutIcon(
+        val viewId: Int,
+        val enabledRes: Int,
+        val disabledRes: Int,
+        val isEnabled: () -> Boolean,
+        val onClickIntent: Intent
+    )
+
+    private val icons by lazy {
+        return@lazy listOf(
+            ShortcutIcon(
+                R.id.iconWifi,
+                R.drawable.wifi_enabled,
+                R.drawable.wifi_disabled,
+                { isWifiEnabled() },
+                Intent(Settings.ACTION_WIFI_SETTINGS)
+            ),
+            ShortcutIcon(
+                R.id.iconBluetooth,
+                R.drawable.bluetooth_enabled,
+                R.drawable.bluetooth_disabled,
+                { isBluetoothEnabled() },
+                Intent(Settings.ACTION_BLUETOOTH_SETTINGS)
+            ),
+            ShortcutIcon(
+                R.id.iconCellular,
+                R.drawable.cell_data,
+                R.drawable.cell_data, // same icon, just color changes
+                { isCellularDataEnabled() },
+                Intent(Settings.ACTION_DATA_ROAMING_SETTINGS)
+            ),
+            ShortcutIcon(
+                R.id.iconAirplane,
+                R.drawable.airplanemode_active,
+                R.drawable.airplanemode_active, // same icon, just color changes
+                { isAirplaneModeOn() },
+                Intent(Settings.ACTION_AIRPLANE_MODE_SETTINGS)
+            )
+        )
+    }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-
-        // WiFi icon clickable
-        wifiIcon = view.findViewById(R.id.iconWifi)
-        bluetoothIcon = view.findViewById(R.id.iconBluetooth)
-        cellularIcon = view.findViewById(R.id.iconCellular)
-        airplaneIcon = view.findViewById(R.id.iconAirplane)
-
-        updateAllIcons()
-
-        wifiIcon?.setOnClickListener {
-            val intent = Intent(Settings.ACTION_WIFI_SETTINGS)
-            startActivity(intent)
+        icons.forEach { icon ->
+            val imageView = view.findViewById<android.widget.ImageView>(icon.viewId)
+            imageView?.setOnClickListener { startActivity(icon.onClickIntent) }
         }
-        bluetoothIcon?.setOnClickListener {
-            val intent = Intent(Settings.ACTION_BLUETOOTH_SETTINGS)
-            startActivity(intent)
-        }
-        cellularIcon?.setOnClickListener {
-            val intent = Intent(Settings.ACTION_DATA_ROAMING_SETTINGS)
-            startActivity(intent)
-        }
-        airplaneIcon?.setOnClickListener {
-            val intent = Intent(Settings.ACTION_AIRPLANE_MODE_SETTINGS)
-            startActivity(intent)
-        }
+        updateAllIcons(view)
     }
 
     override fun onResume() {
         super.onResume()
-        updateAllIcons()
+        view?.let { updateAllIcons(it) }
     }
 
-    private fun updateAllIcons() {
-        updateWifiIcon(wifiIcon, isWifiEnabled())
-        updateBluetoothIcon(bluetoothIcon, isBluetoothEnabled())
-        updateCellularIcon(cellularIcon, isCellularDataEnabled())
-        updateAirplaneIcon(airplaneIcon, isAirplaneModeOn())
-    }
-
-    private fun updateCellularIcon(cellularIcon: android.widget.ImageView?, enabled: Boolean) {
-        cellularIcon?.let {
-            if (enabled) {
-                it.setImageResource(R.drawable.cell_data)
-                val bg = android.graphics.drawable.GradientDrawable()
-                bg.shape = android.graphics.drawable.GradientDrawable.OVAL
-                bg.setColor(android.graphics.Color.parseColor("#2196F3"))
-                it.background = bg
-            } else {
-                it.setImageResource(R.drawable.cell_data)
-                val bg = android.graphics.drawable.GradientDrawable()
-                bg.shape = android.graphics.drawable.GradientDrawable.OVAL
-                bg.setColor(android.graphics.Color.parseColor("#BDBDBD"))
-                it.background = bg
-            }
+    private fun updateAllIcons(view: View) {
+        icons.forEach { icon ->
+            val imageView = view.findViewById<android.widget.ImageView>(icon.viewId)
+            updateIcon(imageView, icon.enabledRes, icon.disabledRes, icon.isEnabled())
         }
     }
 
-    private fun updateAirplaneIcon(airplaneIcon: android.widget.ImageView?, enabled: Boolean) {
-        airplaneIcon?.let {
-            if (enabled) {
-                it.setImageResource(R.drawable.airplanemode_active)
-                val bg = android.graphics.drawable.GradientDrawable()
-                bg.shape = android.graphics.drawable.GradientDrawable.OVAL
-                bg.setColor(android.graphics.Color.parseColor("#2196F3"))
-                it.background = bg
+    private fun updateIcon(
+        imageView: android.widget.ImageView?,
+        enabledRes: Int,
+        disabledRes: Int,
+        enabled: Boolean
+    ) {
+        imageView?.let {
+            val (iconRes, color) = if (enabled) {
+                enabledRes to "#2196F3"
             } else {
-                it.setImageResource(R.drawable.airplanemode_active)
-                val bg = android.graphics.drawable.GradientDrawable()
-                bg.shape = android.graphics.drawable.GradientDrawable.OVAL
-                bg.setColor(android.graphics.Color.parseColor("#BDBDBD"))
-                it.background = bg
+                disabledRes to "#BDBDBD"
             }
-        }
-    }
-
-    private fun updateBluetoothIcon(bluetoothIcon: android.widget.ImageView?, enabled: Boolean) {
-        bluetoothIcon?.let {
-            if (enabled) {
-                it.setImageResource(R.drawable.bluetooth_enabled)
-                val bg = android.graphics.drawable.GradientDrawable()
-                bg.shape = android.graphics.drawable.GradientDrawable.OVAL
-                bg.setColor(android.graphics.Color.parseColor("#2196F3"))
-                it.background = bg
-            } else {
-                it.setImageResource(R.drawable.bluetooth_disabled)
-                val bg = android.graphics.drawable.GradientDrawable()
-                bg.shape = android.graphics.drawable.GradientDrawable.OVAL
-                bg.setColor(android.graphics.Color.parseColor("#BDBDBD"))
-                it.background = bg
+            it.setImageResource(iconRes)
+            val bg = android.graphics.drawable.GradientDrawable().apply {
+                shape = android.graphics.drawable.GradientDrawable.OVAL
+                setColor(android.graphics.Color.parseColor(color))
             }
-        }
-    }
-
-    private fun updateWifiIcon(wifiIcon: android.widget.ImageView?, enabled: Boolean) {
-        wifiIcon?.let {
-            val context = it.context
-            if (enabled) {
-                it.setImageResource(R.drawable.wifi_enabled)
-                val bg = android.graphics.drawable.GradientDrawable()
-                bg.shape = android.graphics.drawable.GradientDrawable.OVAL
-                bg.setColor(android.graphics.Color.parseColor("#2196F3"))
-                it.background = bg
-            } else {
-                it.setImageResource(R.drawable.wifi_disabled)
-                val bg = android.graphics.drawable.GradientDrawable()
-                bg.shape = android.graphics.drawable.GradientDrawable.OVAL
-                bg.setColor(android.graphics.Color.parseColor("#BDBDBD"))
-                it.background = bg
-            }
+            it.background = bg
         }
     }
 
@@ -142,37 +98,28 @@ class ShortcutsFragment : Fragment(R.layout.fragment_shortcuts) {
             val act = activity ?: return false
             val wifiManager = act.applicationContext.getSystemService(Context.WIFI_SERVICE)
             (wifiManager as? WifiManager)?.isWifiEnabled == true
-        } catch (e: Exception) {
+        } catch (_: Exception) {
             false
         }
     }
 
     private fun isBluetoothEnabled(): Boolean {
-        // Use BluetoothManager for API 18+
         return try {
-            val context = activity ?: return false
-            val bluetoothManager = context.getSystemService(Context.BLUETOOTH_SERVICE) as? android.bluetooth.BluetoothManager
-            val bluetoothAdapter = bluetoothManager?.adapter
-            bluetoothAdapter?.isEnabled == true
-        } catch (e: Exception) {
+            val bluetoothManager = (activity ?: return false).getSystemService(Context.BLUETOOTH_SERVICE) as? android.bluetooth.BluetoothManager
+            bluetoothManager?.adapter?.isEnabled == true
+        } catch (_: Exception) {
             false
         }
     }
 
     private fun isCellularDataEnabled(): Boolean {
-        // Use NetworkCapabilities for modern Android
         return try {
-            val context = activity ?: return false
-            val cm = context.getSystemService(Context.CONNECTIVITY_SERVICE) as? android.net.ConnectivityManager
+            val cm = (activity ?: return false).getSystemService(Context.CONNECTIVITY_SERVICE) as? android.net.ConnectivityManager
             val networks = cm?.allNetworks ?: return false
-            for (network in networks) {
-                val caps = cm.getNetworkCapabilities(network)
-                if (caps != null && caps.hasTransport(android.net.NetworkCapabilities.TRANSPORT_CELLULAR)) {
-                    return true
-                }
+            networks.any { network ->
+                cm.getNetworkCapabilities(network)?.hasTransport(android.net.NetworkCapabilities.TRANSPORT_CELLULAR) == true
             }
-            false
-        } catch (e: Exception) {
+        } catch (_: Exception) {
             false
         }
     }
@@ -181,7 +128,7 @@ class ShortcutsFragment : Fragment(R.layout.fragment_shortcuts) {
         return try {
             val act = activity ?: return false
             Settings.Global.getInt(act.contentResolver, Settings.Global.AIRPLANE_MODE_ON, 0) != 0
-        } catch (e: Exception) {
+        } catch (_: Exception) {
             false
         }
     }
