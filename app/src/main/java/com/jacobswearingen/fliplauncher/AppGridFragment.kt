@@ -5,57 +5,36 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.BaseAdapter
-import android.widget.TextView
+import android.widget.GridView
 import android.widget.ImageView
-import android.widget.ListView
+import android.widget.TextView
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
-import androidx.navigation.fragment.findNavController
 
-class AppListFragment : Fragment(R.layout.fragment_app_list), KeyEventHandler {
-    private var showingGrid = false
-    override fun onKeyDown(keyCode: Int, event: android.view.KeyEvent?): Boolean {
-        if (keyCode == android.view.KeyEvent.KEYCODE_SOFT_RIGHT || keyCode == 48) {
-            if (!showingGrid) {
-                switchToGridView()
-                return true
-            }
-        }
-        return false
-    }
-
-    private fun switchToGridView() {
-        showingGrid = true
-        requireActivity().supportFragmentManager.beginTransaction()
-            .replace(id, AppGridFragment())
-            .addToBackStack(null)
-            .commit()
-    }
-
+class AppGridFragment : Fragment(R.layout.fragment_app_grid) {
     private val viewModel: AppListViewModel by viewModels()
-    private lateinit var adapter: AppListAdapter
+    private lateinit var adapter: AppGridAdapter
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-        val listView = view.findViewById<ListView>(R.id.appList)
+        val gridView = view.findViewById<GridView>(R.id.appGrid)
         val pm = requireContext().packageManager
-        adapter = AppListAdapter(pm)
-        listView.adapter = adapter
+        adapter = AppGridAdapter(pm)
+        gridView.adapter = adapter
 
         viewModel.apps.observe(viewLifecycleOwner) { loadedApps ->
             adapter.submitList(loadedApps)
         }
 
-        listView.setOnItemClickListener { _, _, position, _ ->
+        gridView.setOnItemClickListener { _, _, position, _ ->
             val info = adapter.getItem(position)
             pm.getLaunchIntentForPackage(info.activityInfo.packageName)?.let {
                 startActivity(it)
-                findNavController().popBackStack(R.id.mainFragment, false)
             }
         }
     }
 
-    private inner class AppListAdapter(
+    private inner class AppGridAdapter(
         private val pm: android.content.pm.PackageManager
     ) : BaseAdapter() {
         private var apps: List<android.content.pm.ResolveInfo> = emptyList()
@@ -76,7 +55,7 @@ class AppListFragment : Fragment(R.layout.fragment_app_list), KeyEventHandler {
             val view: View
 
             if (convertView == null) {
-                view = LayoutInflater.from(parent?.context).inflate(R.layout.item_app_list, parent, false)
+                view = LayoutInflater.from(parent?.context).inflate(R.layout.item_app_grid, parent, false)
                 holder = ViewHolder(
                     view.findViewById(R.id.appLabel),
                     view.findViewById(R.id.appIcon)
