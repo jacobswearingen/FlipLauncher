@@ -128,10 +128,10 @@ public class AppListFragment extends Fragment implements KeyEventHandler {
                 icon.setImageDrawable(info.loadIcon(pm));
                 // Accessibility: set content description
                 CharSequence labelText = info.loadLabel(pm);
-                icon.setContentDescription(labelText != null ? labelText : "App icon");
+                icon.setContentDescription(labelText);
             }
         } catch (Exception e) {
-            if (icon != null) icon.setImageDrawable(ContextCompat.getDrawable(requireContext(), android.R.drawable.sym_def_app_icon));
+            icon.setImageDrawable(ContextCompat.getDrawable(requireContext(), android.R.drawable.sym_def_app_icon));
         }
         itemView.setOnClickListener(v -> {
             try {

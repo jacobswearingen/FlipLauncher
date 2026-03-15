@@ -12,7 +12,6 @@ import androidx.lifecycle.LiveData;
 import androidx.lifecycle.MutableLiveData;
 
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
 
@@ -45,21 +44,19 @@ public class NotificationsViewModel extends AndroidViewModel implements Notifica
             NotificationManager nm = getApplication().getSystemService(NotificationManager.class);
             List<StatusBarNotification> notifications = NotificationService.getActiveNotificationsList();
             List<StatusBarNotification> sorted = new ArrayList<>(notifications);
-            Collections.sort(sorted, new Comparator<StatusBarNotification>() {
+            sorted.sort(new Comparator<>() {
                 @Override
+
                 public int compare(StatusBarNotification a, StatusBarNotification b) {
-                    int priorityA = a.getNotification().priority;
-                    int priorityB = b.getNotification().priority;
-                    if (priorityA != priorityB) return Integer.compare(priorityB, priorityA);
+                    int importanceA = getImportance(nm, a);
+                    int importanceB = getImportance(nm, b);
+                    if (importanceA != importanceB)
+                        return Integer.compare(importanceB, importanceA);
 
                     String channelA = safeChannelId(a);
                     String channelB = safeChannelId(b);
                     int cmp = channelA.compareTo(channelB);
                     if (cmp != 0) return cmp;
-
-                    int importanceA = getImportance(nm, a);
-                    int importanceB = getImportance(nm, b);
-                    if (importanceA != importanceB) return Integer.compare(importanceB, importanceA);
 
                     return Long.compare(b.getPostTime(), a.getPostTime());
                 }
@@ -75,7 +72,8 @@ public class NotificationsViewModel extends AndroidViewModel implements Notifica
                         NotificationChannel channel = nm.getNotificationChannel(channelId);
                         if (channel != null) return channel.getImportance();
                     }
-                    return sbn.getNotification().priority;
+                    // Fallback: use NotificationManager.IMPORTANCE_DEFAULT if channel/importance not available
+                    return NotificationManager.IMPORTANCE_DEFAULT;
                 }
             });
             notificationsLiveData.postValue(sorted);

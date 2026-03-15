@@ -40,7 +40,7 @@ public class MainActivity extends AppCompatActivity {
     public boolean onKeyDown(int keyCode, android.view.KeyEvent event) {
         androidx.fragment.app.Fragment navHostFragment = getSupportFragmentManager().findFragmentById(R.id.nav_host_fragment);
         androidx.fragment.app.Fragment currentFragment = null;
-        if (navHostFragment != null && navHostFragment.getChildFragmentManager().getFragments().size() > 0) {
+        if (navHostFragment != null && !navHostFragment.getChildFragmentManager().getFragments().isEmpty()) {
             currentFragment = navHostFragment.getChildFragmentManager().getFragments().get(0);
         }
         if (currentFragment instanceof KeyEventHandler) {
