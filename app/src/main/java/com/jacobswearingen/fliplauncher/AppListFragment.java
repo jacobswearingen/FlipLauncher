@@ -1,5 +1,6 @@
 package com.jacobswearingen.fliplauncher;
 
+import android.content.Context;
 import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
 import android.content.pm.ResolveInfo;
@@ -90,14 +91,14 @@ public class AppListFragment extends Fragment implements KeyEventHandler {
     private void populateApps(List<ResolveInfo> apps) {
         if (appContainer == null) return;
         appContainer.removeAllViews();
-        List<ResolveInfo> appList = (apps == null) ? java.util.Collections.emptyList() : apps;
-        boolean grid = isShowingGrid();
-        int columns = grid ? 3 : 1;
-        LayoutInflater inflater = LayoutInflater.from(requireContext());
-        PackageManager pm = requireContext().getPackageManager();
-        int rowCount = (int) Math.ceil(appList.size() / (float) columns);
+        final List<ResolveInfo> appList = (apps == null) ? java.util.Collections.emptyList() : apps;
+        final boolean grid = isShowingGrid();
+        final int columns = grid ? 3 : 1;
+        final LayoutInflater inflater = LayoutInflater.from(requireContext());
+        final PackageManager pm = requireContext().getPackageManager();
+        final int rowCount = (int) Math.ceil(appList.size() / (float) columns);
         for (int row = 0; row < rowCount; row++) {
-            LinearLayout rowLayout = new LinearLayout(requireContext());
+            final LinearLayout rowLayout = new LinearLayout(requireContext());
             rowLayout.setOrientation(LinearLayout.HORIZONTAL);
             rowLayout.setLayoutParams(new ViewGroup.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT));
             for (int col = 0; col < columns; col++) {
@@ -113,17 +114,22 @@ public class AppListFragment extends Fragment implements KeyEventHandler {
     }
 
     private void addAppItem(LinearLayout rowLayout, ResolveInfo info, LayoutInflater inflater, PackageManager pm, boolean isGrid) {
-        View itemView = inflater.inflate(isGrid ? R.layout.item_app_grid : R.layout.item_app_list, rowLayout, false);
+        final View itemView = inflater.inflate(isGrid ? R.layout.item_app_grid : R.layout.item_app_list, rowLayout, false);
         if (isGrid) {
             // Set layout_weight so all columns are evenly distributed
             LinearLayout.LayoutParams params = new LinearLayout.LayoutParams(0, ViewGroup.LayoutParams.WRAP_CONTENT, 1f);
             itemView.setLayoutParams(params);
         }
-        TextView label = itemView.findViewById(R.id.appLabel);
-        ImageView icon = itemView.findViewById(R.id.appIcon);
+        final TextView label = itemView.findViewById(R.id.appLabel);
+        final ImageView icon = itemView.findViewById(R.id.appIcon);
         if (label != null) label.setText(info.loadLabel(pm));
         try {
-            if (icon != null) icon.setImageDrawable(info.loadIcon(pm));
+            if (icon != null) {
+                icon.setImageDrawable(info.loadIcon(pm));
+                // Accessibility: set content description
+                CharSequence labelText = info.loadLabel(pm);
+                icon.setContentDescription(labelText != null ? labelText : "App icon");
+            }
         } catch (Exception e) {
             if (icon != null) icon.setImageDrawable(ContextCompat.getDrawable(requireContext(), android.R.drawable.sym_def_app_icon));
         }
