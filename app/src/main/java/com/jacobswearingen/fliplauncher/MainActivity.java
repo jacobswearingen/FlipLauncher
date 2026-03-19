@@ -38,6 +38,12 @@ public class MainActivity extends AppCompatActivity {
 
     @Override
     public boolean onKeyDown(int keyCode, android.view.KeyEvent event) {
+        if (keyCode == android.view.KeyEvent.KEYCODE_FUNCTION) {
+            androidx.navigation.NavController navController =
+                    androidx.navigation.Navigation.findNavController(this, R.id.nav_host_fragment);
+            navController.popBackStack(R.id.mainFragment, false);
+            return true;
+        }
         androidx.fragment.app.Fragment navHostFragment = getSupportFragmentManager().findFragmentById(R.id.nav_host_fragment);
         androidx.fragment.app.Fragment currentFragment = null;
         if (navHostFragment != null && !navHostFragment.getChildFragmentManager().getFragments().isEmpty()) {
