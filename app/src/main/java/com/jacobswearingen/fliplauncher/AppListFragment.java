@@ -30,7 +30,7 @@ public class AppListFragment extends Fragment implements KeyEventHandler {
     private static final String KEY_SHOWING_GRID = "showing_grid";
 
     private boolean isShowingGrid() {
-        return prefs.getBoolean(KEY_SHOWING_GRID, false);
+        return prefs.getBoolean(KEY_SHOWING_GRID, true);
     }
     private void setShowingGrid(boolean value) {
         prefs.edit().putBoolean(KEY_SHOWING_GRID, value).apply();
