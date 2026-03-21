@@ -18,6 +18,7 @@ import android.widget.TextView;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
+import androidx.navigation.fragment.NavHostFragment;
 
 public class ShortcutsFragment extends Fragment {
 
@@ -37,6 +38,22 @@ public class ShortcutsFragment extends Fragment {
                 "Cellular Data", new Intent(Settings.ACTION_DATA_ROAMING_SETTINGS), this::isCellularDataEnabled);
         setupShortcut(view, R.id.itemAirplane, R.drawable.airplanemode_active, R.drawable.airplanemode_inactive,
                 "Airplane Mode", new Intent(Settings.ACTION_AIRPLANE_MODE_SETTINGS), this::isAirplaneModeOn);
+
+        // Settings — navigates within the app
+        View settingsItem = view.findViewById(R.id.itemLauncherSettings);
+        ((TextView) settingsItem.findViewById(R.id.shortcutLabel)).setText("Settings");
+        ImageView settingsIcon = settingsItem.findViewById(R.id.shortcutIcon);
+        settingsIcon.setImageResource(R.drawable.settings);
+        GradientDrawable settingsBg = new GradientDrawable();
+        settingsBg.setShape(GradientDrawable.OVAL);
+        settingsBg.setColor(Color.parseColor("#2196F3"));
+        settingsIcon.setBackground(settingsBg);
+        settingsItem.setOnClickListener(v ->
+                NavHostFragment.findNavController(ShortcutsFragment.this).navigate(R.id.settingsFragment));
+
+        // Hide unused extra slot
+        View extraItem = view.findViewById(R.id.itemExtra1);
+        if (extraItem != null) extraItem.setVisibility(View.INVISIBLE);
     }
 
     @Override

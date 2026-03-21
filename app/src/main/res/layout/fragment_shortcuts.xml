@@ -30,7 +30,7 @@
         android:layout_columnWeight="1" />
     <include
         layout="@layout/shortcut_item"
-        android:id="@+id/itemCellular"
+        android:id="@+id/itemAirplane"
         android:layout_row="0"
         android:layout_column="2"
         android:layout_width="0dp"
@@ -39,7 +39,7 @@
         android:layout_columnWeight="1" />
     <include
         layout="@layout/shortcut_item"
-        android:id="@+id/itemAirplane"
+        android:id="@+id/itemCellular"
         android:layout_row="1"
         android:layout_column="0"
         android:layout_width="0dp"
@@ -57,7 +57,7 @@
         android:layout_columnWeight="1" />
     <include
         layout="@layout/shortcut_item"
-        android:id="@+id/itemExtra2"
+        android:id="@+id/itemLauncherSettings"
         android:layout_row="1"
         android:layout_column="2"
         android:layout_width="0dp"

@@ -1,5 +1,5 @@
 <resources>
-    <style name="Theme.FlipLauncher" parent="Theme.MaterialComponents.DayNight.NoActionBar">
+    <style name="Theme.FlipLauncher" parent="Theme.MaterialComponents.NoActionBar">
         <item name="android:windowBackground">#000000</item>
         <item name="android:statusBarColor">#000000</item>
     </style>

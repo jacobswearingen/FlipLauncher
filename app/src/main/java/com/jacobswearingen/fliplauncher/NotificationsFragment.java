@@ -9,6 +9,7 @@ import android.graphics.drawable.Drawable;
 import android.os.Bundle;
 import android.service.notification.StatusBarNotification;
 import android.text.format.DateUtils;
+import android.view.KeyEvent;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -96,15 +97,15 @@ public class NotificationsFragment extends Fragment implements KeyEventHandler {
     }
 
     @Override
-    public boolean onKeyDown(int keyCode, android.view.KeyEvent event) {
-        if (keyCode == android.view.KeyEvent.KEYCODE_SOFT_LEFT) {
+    public boolean onKeyDown(int keyCode, KeyEvent event) {
+        if (keyCode == KeyEvent.KEYCODE_SOFT_LEFT) {
             int position = listView.getSelectedItemPosition();
             StatusBarNotification sbn = adapter.getItemOrNull(position);
             if (sbn != null) {
                 viewModel.cancelNotification(sbn.getKey());
             }
             return true;
-        } else if (keyCode == android.view.KeyEvent.KEYCODE_SOFT_RIGHT) {
+        } else if (keyCode == KeyEvent.KEYCODE_SOFT_RIGHT) {
             viewModel.clearAllNotifications();
             return true;
         }

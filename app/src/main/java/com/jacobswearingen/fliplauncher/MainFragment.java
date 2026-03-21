@@ -1,6 +1,7 @@
 package com.jacobswearingen.fliplauncher;
 
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.net.Uri;
 import android.os.Bundle;
 import android.os.Handler;
@@ -41,7 +42,17 @@ public class MainFragment extends Fragment implements KeyEventHandler {
     public void onResume() {
         super.onResume();
         View v = getView();
-        if (v != null) updateTimeViews(v);
+        if (v != null) {
+            updateTimeViews(v);
+        }
+    }
+
+    @Override
+    public void onStop() {
+        super.onStop();
+        if (timeUpdater != null) {
+            handler.removeCallbacks(timeUpdater);
+        }
     }
 
     private void updateTimeViews(@NonNull View view) {
@@ -49,12 +60,9 @@ public class MainFragment extends Fragment implements KeyEventHandler {
         TextView timeView = view.findViewById(R.id.textViewTime);
         TextView ampmView = view.findViewById(R.id.textViewAmPm);
         TextView dateView = view.findViewById(R.id.textViewDate);
-        if (timeView != null)
-            timeView.setText(timeFormat.format(now));
-        if (ampmView != null)
-            ampmView.setText(amPmFormat.format(now));
-        if (dateView != null)
-            dateView.setText(dateFormat.format(now));
+        if (timeView != null) timeView.setText(timeFormat.format(now));
+        if (ampmView != null) ampmView.setText(amPmFormat.format(now));
+        if (dateView != null) dateView.setText(dateFormat.format(now));
     }
 
     private void startMinuteUpdater(@NonNull View view) {
@@ -79,9 +87,15 @@ public class MainFragment extends Fragment implements KeyEventHandler {
         } else if (keyCode == KeyEvent.KEYCODE_SOFT_RIGHT) {
             NavHostFragment.findNavController(this).navigate(R.id.shortcutsFragment);
             return true;
-        } else if (keyCode == KeyEvent.KEYCODE_DPAD_CENTER ) {
+        } else if (keyCode == KeyEvent.KEYCODE_DPAD_CENTER) {
             NavHostFragment.findNavController(this).navigate(R.id.appListFragment);
             return true;
+        } else if (keyCode == KeyEvent.KEYCODE_DPAD_UP) {
+            return launchByPref(LauncherPrefs.KEY_HOTKEY_DPAD_UP);
+        } else if (keyCode == KeyEvent.KEYCODE_DPAD_RIGHT) {
+            return launchByPref(LauncherPrefs.KEY_HOTKEY_DPAD_RIGHT);
+        } else if (keyCode == KeyEvent.KEYCODE_DPAD_LEFT) {
+            return launchByPref(LauncherPrefs.KEY_HOTKEY_DPAD_LEFT);
         } else if ((keyCode >= KeyEvent.KEYCODE_0 && keyCode <= KeyEvent.KEYCODE_9)
                 || keyCode == KeyEvent.KEYCODE_STAR || keyCode == KeyEvent.KEYCODE_POUND) {
             String digit;
@@ -97,6 +111,18 @@ public class MainFragment extends Fragment implements KeyEventHandler {
             Intent dialIntent = new Intent(Intent.ACTION_DIAL, Uri.parse("tel:" + digit));
             dialIntent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
             startActivity(dialIntent);
+            return true;
+        }
+        return false;
+    }
+
+    private boolean launchByPref(String key) {
+        SharedPreferences prefs = requireContext().getSharedPreferences(LauncherPrefs.PREFS, 0);
+        String pkg = prefs.getString(key, null);
+        if (pkg == null || LauncherPrefs.DEST_NONE.equals(pkg)) return false;
+        Intent launchIntent = requireContext().getPackageManager().getLaunchIntentForPackage(pkg);
+        if (launchIntent != null) {
+            startActivity(launchIntent);
             return true;
         }
         return false;

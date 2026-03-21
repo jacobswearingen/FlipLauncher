@@ -3,17 +3,21 @@ package com.jacobswearingen.fliplauncher;
 import android.content.Intent;
 import android.os.Bundle;
 import android.provider.Settings;
+import android.view.KeyEvent;
 import android.widget.Toast;
 
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
-import androidx.appcompat.app.AppCompatDelegate;
 import androidx.core.app.NotificationManagerCompat;
+import androidx.fragment.app.Fragment;
+import androidx.navigation.NavController;
+import androidx.navigation.Navigation;
+
+import java.util.List;
 
 public class MainActivity extends AppCompatActivity {
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
-        AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_YES);
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
@@ -37,23 +41,26 @@ public class MainActivity extends AppCompatActivity {
     }
 
     @Override
-    public boolean onKeyDown(int keyCode, android.view.KeyEvent event) {
-        if (keyCode == android.view.KeyEvent.KEYCODE_FUNCTION) {
-            androidx.navigation.NavController navController =
-                    androidx.navigation.Navigation.findNavController(this, R.id.nav_host_fragment);
+    public boolean onKeyDown(int keyCode, KeyEvent event) {
+        if (keyCode == KeyEvent.KEYCODE_FUNCTION) {
+            NavController navController = Navigation.findNavController(this, R.id.nav_host_fragment);
             navController.popBackStack(R.id.mainFragment, false);
             return true;
         }
-        androidx.fragment.app.Fragment navHostFragment = getSupportFragmentManager().findFragmentById(R.id.nav_host_fragment);
-        androidx.fragment.app.Fragment currentFragment = null;
-        if (navHostFragment != null && !navHostFragment.getChildFragmentManager().getFragments().isEmpty()) {
-            currentFragment = navHostFragment.getChildFragmentManager().getFragments().get(0);
-        }
-        if (currentFragment instanceof KeyEventHandler) {
-            if (((KeyEventHandler) currentFragment).onKeyDown(keyCode, event)) {
+        Fragment current = getCurrentFragment();
+        if (current instanceof KeyEventHandler) {
+            if (((KeyEventHandler) current).onKeyDown(keyCode, event)) {
                 return true;
             }
         }
         return super.onKeyDown(keyCode, event);
+    }
+
+    @Nullable
+    private Fragment getCurrentFragment() {
+        Fragment navHost = getSupportFragmentManager().findFragmentById(R.id.nav_host_fragment);
+        if (navHost == null) return null;
+        List<Fragment> fragments = navHost.getChildFragmentManager().getFragments();
+        return fragments.isEmpty() ? null : fragments.get(0);
     }
 }
