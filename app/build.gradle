@@ -6,6 +6,12 @@ android {
     namespace = "com.jacobswearingen.fliplauncher"
     compileSdk = 36
 
+    def keystorePropertiesFile = rootProject.file("keystore.properties")
+    def keystoreProperties = new Properties()
+    if (keystorePropertiesFile.exists()) {
+        keystoreProperties.load(new FileInputStream(keystorePropertiesFile))
+    }
+
     defaultConfig {
         applicationId = "com.jacobswearingen.fliplauncher"
         minSdk = 29
@@ -24,6 +30,27 @@ android {
         }
     }
 
+    signingConfigs {
+        release {
+            storeFile file(keystoreProperties['storeFile'])
+            storePassword keystoreProperties['storePassword']
+            keyAlias keystoreProperties['keyAlias']
+            keyPassword keystoreProperties['keyPassword']
+        }
+    }
+
+    buildTypes {
+        release {
+            signingConfig signingConfigs.release
+            minifyEnabled true
+            shrinkResources true
+        }
+        debug {
+            // Usually keep these false for debug, but you can set them if needed
+            minifyEnabled false
+            shrinkResources false
+        }
+    }
 }
 
 dependencies {

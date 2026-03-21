@@ -3,3 +3,4 @@ app/build/
 build/
 .idea/
 .vscode/
+keystore.properties
