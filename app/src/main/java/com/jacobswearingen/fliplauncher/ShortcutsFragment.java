@@ -112,15 +112,18 @@ public class ShortcutsFragment extends Fragment {
         }
     }
 
+    @SuppressWarnings("deprecation") // getAllNetworks() checks if data is enabled regardless of active route
     private boolean isCellularDataEnabled() {
         try {
             if (getActivity() == null) return false;
             ConnectivityManager cm = (ConnectivityManager) getActivity().getSystemService(Context.CONNECTIVITY_SERVICE);
             if (cm == null) return false;
-            Network[] networks = cm.getAllNetworks();
-            for (Network network : networks) {
+            for (Network network : cm.getAllNetworks()) {
                 NetworkCapabilities caps = cm.getNetworkCapabilities(network);
-                if (caps != null && caps.hasTransport(NetworkCapabilities.TRANSPORT_CELLULAR)) {
+                if (caps != null
+                        && caps.hasTransport(NetworkCapabilities.TRANSPORT_CELLULAR)
+                        && caps.hasCapability(NetworkCapabilities.NET_CAPABILITY_INTERNET)
+                        && caps.hasCapability(NetworkCapabilities.NET_CAPABILITY_NOT_SUSPENDED)) {
                     return true;
                 }
             }
