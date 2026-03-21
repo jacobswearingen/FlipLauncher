@@ -63,7 +63,7 @@ public class SettingsFragment extends Fragment implements KeyEventHandler {
                 if (!isAdded()) return;
                 setupHotkeyRow(view, R.id.rowHotkeyLeft, R.id.textHotkeyLeftApp, LauncherPrefs.KEY_HOTKEY_DPAD_LEFT);
                 setupHotkeyRow(view, R.id.rowHotkeyRight, R.id.textHotkeyRightApp, LauncherPrefs.KEY_HOTKEY_DPAD_RIGHT);
-                setupHotkeyRow(view, R.id.rowHotkeyCenter, R.id.textHotkeyCenterApp, LauncherPrefs.KEY_HOTKEY_DPAD_UP);
+                setupHotkeyRow(view, R.id.rowHotkeyUp, R.id.textHotkeyUpApp, LauncherPrefs.KEY_HOTKEY_DPAD_UP);
             });
         }).start();
     }
