@@ -76,6 +76,9 @@ public class MainFragment extends Fragment implements KeyEventHandler {
         if (keyCode == KeyEvent.KEYCODE_SOFT_LEFT) {
             NavHostFragment.findNavController(this).navigate(R.id.notificationsFragment);
             return true;
+        } else if (keyCode == KeyEvent.KEYCODE_SOFT_RIGHT) {
+            NavHostFragment.findNavController(this).navigate(R.id.shortcutsFragment);
+            return true;
         } else if (keyCode == KeyEvent.KEYCODE_DPAD_CENTER ) {
             NavHostFragment.findNavController(this).navigate(R.id.appListFragment);
             return true;
