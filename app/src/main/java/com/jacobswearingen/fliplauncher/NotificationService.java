@@ -34,19 +34,25 @@ public class NotificationService extends NotificationListenerService {
     }
 
     public static List<StatusBarNotification> getActiveNotificationsList() {
-        if (instance != null && instance.getActiveNotifications() != null) {
-            StatusBarNotification[] arr = instance.getActiveNotifications();
-            List<StatusBarNotification> list = new ArrayList<>(arr.length);
-            Collections.addAll(list, arr);
-            return list;
+        NotificationService service = instance;
+        if (service == null) {
+            return Collections.emptyList();
         }
-        return Collections.emptyList();
+        StatusBarNotification[] activeNotifications = service.getActiveNotifications();
+        if (activeNotifications == null) {
+            return Collections.emptyList();
+        }
+        List<StatusBarNotification> list = new ArrayList<>(activeNotifications.length);
+        Collections.addAll(list, activeNotifications);
+        return list;
     }
 
     public static void cancelNotificationByKey(String key) {
         NotificationService service = instance;
-        if (service == null || service.getActiveNotifications() == null) return;
-        for (StatusBarNotification sbn : service.getActiveNotifications()) {
+        if (service == null) return;
+        StatusBarNotification[] activeNotifications = service.getActiveNotifications();
+        if (activeNotifications == null) return;
+        for (StatusBarNotification sbn : activeNotifications) {
             if (sbn.getKey().equals(key) && isNotificationCancelable(sbn)) {
                 service.cancelNotification(key);
                 break;
@@ -63,8 +69,10 @@ public class NotificationService extends NotificationListenerService {
 
     public static void clearAllSystemNotifications() {
         NotificationService service = instance;
-        if (service == null || service.getActiveNotifications() == null) return;
-        for (StatusBarNotification sbn : service.getActiveNotifications()) {
+        if (service == null) return;
+        StatusBarNotification[] activeNotifications = service.getActiveNotifications();
+        if (activeNotifications == null) return;
+        for (StatusBarNotification sbn : activeNotifications) {
             if (isNotificationCancelable(sbn)) {
                 service.cancelNotification(sbn.getKey());
             }

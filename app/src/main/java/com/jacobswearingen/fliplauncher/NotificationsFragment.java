@@ -4,6 +4,8 @@ package com.jacobswearingen.fliplauncher;
 import android.app.Notification;
 import android.app.PendingIntent;
 import android.content.Intent;
+import android.content.pm.PackageManager;
+import android.graphics.drawable.Drawable;
 import android.os.Bundle;
 import android.service.notification.StatusBarNotification;
 import android.text.format.DateUtils;
@@ -24,13 +26,16 @@ import androidx.lifecycle.ViewModelProvider;
 import androidx.navigation.fragment.NavHostFragment;
 
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 public class NotificationsFragment extends Fragment implements KeyEventHandler {
     private int selectedNotificationIndex = 0;
     private ListView listView;
     private NotificationAdapter adapter;
     private NotificationsViewModel viewModel;
+    private PackageManager packageManager;
 
     public NotificationsFragment() {
         super(R.layout.fragment_notifications);
@@ -39,6 +44,7 @@ public class NotificationsFragment extends Fragment implements KeyEventHandler {
     @Override
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
+        packageManager = requireContext().getPackageManager();
         listView = view.findViewById(R.id.notificationList);
         adapter = new NotificationAdapter();
         listView.setAdapter(adapter);
@@ -66,7 +72,7 @@ public class NotificationsFragment extends Fragment implements KeyEventHandler {
                 }
             } else {
                 try {
-                    Intent launchIntent = requireContext().getPackageManager().getLaunchIntentForPackage(sbn.getPackageName());
+                    Intent launchIntent = packageManager.getLaunchIntentForPackage(sbn.getPackageName());
                     if (launchIntent != null) {
                         startActivity(launchIntent);
                         NavHostFragment.findNavController(this).popBackStack(R.id.mainFragment, false);
@@ -91,14 +97,14 @@ public class NotificationsFragment extends Fragment implements KeyEventHandler {
 
     @Override
     public boolean onKeyDown(int keyCode, android.view.KeyEvent event) {
-        if (keyCode == android.view.KeyEvent.KEYCODE_SOFT_LEFT || keyCode == 139) {
+        if (keyCode == android.view.KeyEvent.KEYCODE_SOFT_LEFT) {
             int position = listView.getSelectedItemPosition();
             StatusBarNotification sbn = adapter.getItemOrNull(position);
             if (sbn != null) {
                 viewModel.cancelNotification(sbn.getKey());
             }
             return true;
-        } else if (keyCode == android.view.KeyEvent.KEYCODE_SOFT_RIGHT || keyCode == 48) {
+        } else if (keyCode == android.view.KeyEvent.KEYCODE_SOFT_RIGHT) {
             viewModel.clearAllNotifications();
             return true;
         }
@@ -107,6 +113,7 @@ public class NotificationsFragment extends Fragment implements KeyEventHandler {
 
     private class NotificationAdapter extends BaseAdapter {
         private List<StatusBarNotification> items = Collections.emptyList();
+        private final Map<String, Drawable> iconCache = new HashMap<>();
 
         void submitList(List<StatusBarNotification> newList) {
             items = newList != null ? newList : Collections.emptyList();
@@ -128,27 +135,55 @@ public class NotificationsFragment extends Fragment implements KeyEventHandler {
 
         @Override
         public View getView(int position, View convertView, ViewGroup parent) {
-            View v = convertView != null ? convertView : LayoutInflater.from(parent.getContext()).inflate(R.layout.item_notification_list, parent, false);
-            StatusBarNotification sbn = getItem(position);
-            ImageView appIcon = v.findViewById(R.id.appIcon);
-            try {
-                appIcon.setImageDrawable(requireContext().getPackageManager().getApplicationIcon(sbn.getPackageName()));
-            } catch (Exception e) {
-                appIcon.setImageResource(android.R.drawable.sym_def_app_icon);
+            View v = convertView;
+            ViewHolder holder;
+            if (v == null) {
+                v = LayoutInflater.from(parent.getContext()).inflate(R.layout.item_notification_list, parent, false);
+                holder = new ViewHolder(v);
+                v.setTag(holder);
+            } else {
+                holder = (ViewHolder) v.getTag();
             }
+            StatusBarNotification sbn = getItem(position);
+            holder.appIcon.setImageDrawable(getAppIcon(sbn.getPackageName()));
             Notification notification = sbn.getNotification();
             CharSequence title = notification.extras.getCharSequence(Notification.EXTRA_TITLE, "");
             CharSequence text = notification.extras.getCharSequence(Notification.EXTRA_TEXT, "");
-            TextView notificationText = v.findViewById(R.id.notificationText);
-            notificationText.setText(title + ": " + text);
-            TextView notificationTimestamp = v.findViewById(R.id.notificationTimestamp);
-            notificationTimestamp.setText(DateUtils.getRelativeTimeSpanString(
+            holder.notificationText.setText(title + ": " + text);
+            holder.notificationTimestamp.setText(DateUtils.getRelativeTimeSpanString(
                     sbn.getPostTime(),
                     System.currentTimeMillis(),
                     DateUtils.MINUTE_IN_MILLIS,
                     DateUtils.FORMAT_ABBREV_RELATIVE
             ));
             return v;
+        }
+
+        private Drawable getAppIcon(String packageName) {
+            Drawable cachedIcon = iconCache.get(packageName);
+            if (cachedIcon != null) {
+                return cachedIcon;
+            }
+            Drawable icon;
+            try {
+                icon = packageManager.getApplicationIcon(packageName);
+            } catch (Exception e) {
+                icon = androidx.core.content.ContextCompat.getDrawable(requireContext(), android.R.drawable.sym_def_app_icon);
+            }
+            iconCache.put(packageName, icon);
+            return icon;
+        }
+
+        private static final class ViewHolder {
+            private final ImageView appIcon;
+            private final TextView notificationText;
+            private final TextView notificationTimestamp;
+
+            private ViewHolder(View itemView) {
+                appIcon = itemView.findViewById(R.id.appIcon);
+                notificationText = itemView.findViewById(R.id.notificationText);
+                notificationTimestamp = itemView.findViewById(R.id.notificationTimestamp);
+            }
         }
     }
 }

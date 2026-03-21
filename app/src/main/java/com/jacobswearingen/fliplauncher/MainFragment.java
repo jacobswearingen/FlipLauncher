@@ -11,7 +11,6 @@ import android.widget.TextView;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
-import androidx.appcompat.app.AppCompatDelegate;
 import androidx.fragment.app.Fragment;
 import androidx.navigation.fragment.NavHostFragment;
 
@@ -22,6 +21,9 @@ import java.util.Locale;
 
 public class MainFragment extends Fragment implements KeyEventHandler {
     private final Handler handler = new Handler(Looper.getMainLooper());
+    private final SimpleDateFormat timeFormat = new SimpleDateFormat("h:mm", Locale.getDefault());
+    private final SimpleDateFormat amPmFormat = new SimpleDateFormat("a", Locale.getDefault());
+    private final SimpleDateFormat dateFormat = new SimpleDateFormat("EEE, MMM d", Locale.getDefault());
     private Runnable timeUpdater;
 
     public MainFragment() {
@@ -31,7 +33,6 @@ public class MainFragment extends Fragment implements KeyEventHandler {
     @Override
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
-        AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_YES);
         updateTimeViews(view);
         startMinuteUpdater(view);
     }
@@ -49,11 +50,11 @@ public class MainFragment extends Fragment implements KeyEventHandler {
         TextView ampmView = view.findViewById(R.id.textViewAmPm);
         TextView dateView = view.findViewById(R.id.textViewDate);
         if (timeView != null)
-            timeView.setText(new SimpleDateFormat("h:mm", Locale.getDefault()).format(now));
+            timeView.setText(timeFormat.format(now));
         if (ampmView != null)
-            ampmView.setText(new SimpleDateFormat("a", Locale.getDefault()).format(now));
+            ampmView.setText(amPmFormat.format(now));
         if (dateView != null)
-            dateView.setText(new SimpleDateFormat("EEE, MMM d", Locale.getDefault()).format(now));
+            dateView.setText(dateFormat.format(now));
     }
 
     private void startMinuteUpdater(@NonNull View view) {
@@ -72,10 +73,10 @@ public class MainFragment extends Fragment implements KeyEventHandler {
 
     @Override
     public boolean onKeyDown(int keyCode, KeyEvent event) {
-        if (keyCode == KeyEvent.KEYCODE_SOFT_LEFT || keyCode == 139) {
+        if (keyCode == KeyEvent.KEYCODE_SOFT_LEFT) {
             NavHostFragment.findNavController(this).navigate(R.id.notificationsFragment);
             return true;
-        } else if (keyCode == KeyEvent.KEYCODE_DPAD_CENTER || keyCode == 28) {
+        } else if (keyCode == KeyEvent.KEYCODE_DPAD_CENTER ) {
             NavHostFragment.findNavController(this).navigate(R.id.appListFragment);
             return true;
         } else if ((keyCode >= KeyEvent.KEYCODE_0 && keyCode <= KeyEvent.KEYCODE_9)
