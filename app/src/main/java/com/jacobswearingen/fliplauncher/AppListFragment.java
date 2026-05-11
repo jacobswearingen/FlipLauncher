@@ -31,6 +31,7 @@ public class AppListFragment extends Fragment implements KeyEventHandler {
     private static final int GRID_COLUMN_COUNT = 3;
 
     private RecyclerView appListView;
+    private TextView toggleLayoutLabel;
     private AppListViewModel viewModel;
     private SharedPreferences prefs;
     private static final String KEY_SHOWING_GRID = "showing_grid";
@@ -61,6 +62,8 @@ public class AppListFragment extends Fragment implements KeyEventHandler {
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
         appListView = view.findViewById(R.id.appListView);
+        toggleLayoutLabel = view.findViewById(R.id.textViewToggleLayout);
+        updateToggleLabel();
         appListView.setHasFixedSize(true);
         updateLayoutManager();
         adapter = new AppListAdapter();
@@ -103,10 +106,16 @@ public class AppListFragment extends Fragment implements KeyEventHandler {
         if (keyCode == KeyEvent.KEYCODE_SOFT_RIGHT) {
             setShowingGrid(!isShowingGrid());
             updateLayoutManager();
+            updateToggleLabel();
             populateAndFocus(viewModel.getApps().getValue());
             return true;
         }
         return false;
+    }
+
+    private void updateToggleLabel() {
+        if (toggleLayoutLabel == null) return;
+        toggleLayoutLabel.setText(isShowingGrid() ? "List" : "Grid");
     }
 
     private void populateApps(List<ResolveInfo> apps) {
