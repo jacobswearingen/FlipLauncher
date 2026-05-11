@@ -151,8 +151,9 @@ public class NotificationsFragment extends Fragment implements KeyEventHandler {
             CharSequence title = notification.extras.getCharSequence(Notification.EXTRA_TITLE, "");
             CharSequence text = notification.extras.getCharSequence(Notification.EXTRA_TEXT, "");
             holder.notificationText.setText(title + ": " + text);
+            long displayTime = notification.when != 0 ? notification.when : sbn.getPostTime();
             holder.notificationTimestamp.setText(DateUtils.getRelativeTimeSpanString(
-                    sbn.getPostTime(),
+                    displayTime,
                     System.currentTimeMillis(),
                     DateUtils.MINUTE_IN_MILLIS,
                     DateUtils.FORMAT_ABBREV_RELATIVE
