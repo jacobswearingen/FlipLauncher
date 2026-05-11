@@ -4,6 +4,7 @@
         android:theme="@style/Theme.FlipLauncher">
         <activity 
             android:name=".MainActivity"
+            android:launchMode="singleTask"
             android:exported="true">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN"/>
@@ -24,6 +25,7 @@
     <queries> 
         <intent> 
             <action android:name="android.intent.action.MAIN" />
+            <category android:name="android.intent.category.LAUNCHER" />
         </intent> 
     </queries>
 </manifest>
