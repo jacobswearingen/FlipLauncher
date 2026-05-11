@@ -61,6 +61,12 @@ public class NotificationService extends NotificationListenerService {
     }
 
     @Override
+    public void onListenerConnected() {
+        super.onListenerConnected();
+        changes.postValue(null);
+    }
+
+    @Override
     public void onNotificationPosted(StatusBarNotification sbn) {
         super.onNotificationPosted(sbn);
         changes.setValue(null);
