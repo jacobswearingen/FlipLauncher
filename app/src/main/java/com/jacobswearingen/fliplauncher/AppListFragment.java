@@ -1,5 +1,6 @@
 package com.jacobswearingen.fliplauncher;
 
+import android.app.AlertDialog;
 import android.content.Context;
 import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
@@ -20,29 +21,40 @@ import androidx.fragment.app.Fragment;
 import androidx.lifecycle.ViewModelProvider;
 import androidx.navigation.fragment.NavHostFragment;
 import androidx.recyclerview.widget.GridLayoutManager;
-import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 public class AppListFragment extends Fragment implements KeyEventHandler {
     private static final int GRID_COLUMN_COUNT = 3;
+    private static final String KEY_HIDDEN_APPS = "hidden_apps";
 
     private RecyclerView appListView;
-    private TextView toggleLayoutLabel;
+    private TextView toggleLabel;
     private AppListViewModel viewModel;
     private SharedPreferences prefs;
-    private static final String KEY_SHOWING_GRID = "showing_grid";
     private AppListAdapter adapter;
     private PackageManager packageManager;
+    private List<ResolveInfo> allApps = Collections.emptyList();
+    private Set<String> hiddenApps = new HashSet<>();
+    private boolean showingHidden = false;
 
-    private boolean isShowingGrid() {
-        return prefs.getBoolean(KEY_SHOWING_GRID, true);
+    public AppListFragment() {
+        super(R.layout.fragment_app_list);
     }
-    private void setShowingGrid(boolean value) {
-        prefs.edit().putBoolean(KEY_SHOWING_GRID, value).apply();
+
+    private void loadHiddenApps() {
+        hiddenApps = new HashSet<>(prefs.getStringSet(KEY_HIDDEN_APPS, Collections.emptySet()));
+    }
+
+    private void setHiddenState(String pkg, boolean hide) {
+        if (hide) hiddenApps.add(pkg);
+        else hiddenApps.remove(pkg);
+        prefs.edit().putStringSet(KEY_HIDDEN_APPS, hiddenApps).apply();
     }
 
     @Override
@@ -51,111 +63,104 @@ public class AppListFragment extends Fragment implements KeyEventHandler {
         prefs = requireContext().getSharedPreferences("applist_prefs", Context.MODE_PRIVATE);
         packageManager = requireContext().getPackageManager();
         viewModel = new ViewModelProvider(this).get(AppListViewModel.class);
-    }
-
-    @Override
-    public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
-        return inflater.inflate(R.layout.fragment_app_list, container, false);
+        loadHiddenApps();
     }
 
     @Override
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
         appListView = view.findViewById(R.id.appListView);
-        toggleLayoutLabel = view.findViewById(R.id.textViewToggleLayout);
+        toggleLabel = view.findViewById(R.id.textViewToggleLayout);
         updateToggleLabel();
         appListView.setHasFixedSize(true);
-        updateLayoutManager();
+        appListView.setLayoutManager(new GridLayoutManager(requireContext(), GRID_COLUMN_COUNT));
         adapter = new AppListAdapter();
         appListView.setAdapter(adapter);
-        viewModel.getApps().observe(getViewLifecycleOwner(), this::populateAndFocus);
-        populateAndFocus(viewModel.getApps().getValue());
+        viewModel.getApps().observe(getViewLifecycleOwner(), apps -> {
+            allApps = apps != null ? apps : Collections.emptyList();
+            refreshList();
+        });
     }
 
-    private void populateAndFocus(List<ResolveInfo> apps) {
-        populateApps(apps);
+    private void refreshList() {
+        if (adapter == null) return;
+        List<ResolveInfo> displayed = new ArrayList<>();
+        for (ResolveInfo info : allApps) {
+            boolean isHidden = hiddenApps.contains(info.activityInfo.packageName);
+            if (showingHidden ? isHidden : !isHidden) {
+                displayed.add(info);
+            }
+        }
+        adapter.setApps(displayed);
         focusFirstItem();
     }
 
     private void focusFirstItem() {
-        if (appListView == null) {
-            return;
-        }
+        if (appListView == null) return;
         appListView.post(() -> {
             appListView.scrollToPosition(0);
-            View firstItem = getFirstItemView();
-            if (firstItem != null) {
-                firstItem.requestFocus();
-            }
+            RecyclerView.ViewHolder holder = appListView.findViewHolderForAdapterPosition(0);
+            if (holder != null) holder.itemView.requestFocus();
         });
     }
 
-    private View getFirstItemView() {
-        if (appListView == null || adapter == null || adapter.getItemCount() == 0) {
-            return null;
-        }
-        RecyclerView.ViewHolder firstHolder = appListView.findViewHolderForAdapterPosition(0);
-        if (firstHolder != null) {
-            return firstHolder.itemView;
-        }
-        return null;
+    private void updateToggleLabel() {
+        if (toggleLabel == null) return;
+        toggleLabel.setText(showingHidden ? "Normal" : "Hidden");
     }
 
     @Override
     public boolean onKeyDown(int keyCode, KeyEvent event) {
-        if (keyCode == KeyEvent.KEYCODE_SOFT_RIGHT) {
-            setShowingGrid(!isShowingGrid());
-            updateLayoutManager();
+        if (keyCode == KeyEvent.KEYCODE_SOFT_LEFT) {
+            showAppMenu();
+            return true;
+        } else if (keyCode == KeyEvent.KEYCODE_SOFT_RIGHT) {
+            showingHidden = !showingHidden;
             updateToggleLabel();
-            populateAndFocus(viewModel.getApps().getValue());
+            refreshList();
             return true;
         }
         return false;
     }
 
-    private void updateToggleLabel() {
-        if (toggleLayoutLabel == null) return;
-        toggleLayoutLabel.setText(isShowingGrid() ? "List" : "Grid");
-    }
-
-    private void populateApps(List<ResolveInfo> apps) {
-        if (adapter == null) {
-            return;
-        }
-        adapter.setApps(apps == null ? Collections.emptyList() : apps);
-    }
-
-    private void updateLayoutManager() {
-        if (appListView == null) {
-            return;
-        }
-        RecyclerView.LayoutManager layoutManager;
-        if (isShowingGrid()) {
-            layoutManager = new GridLayoutManager(requireContext(), GRID_COLUMN_COUNT);
-        } else {
-            layoutManager = new LinearLayoutManager(requireContext());
-        }
-        appListView.setLayoutManager(layoutManager);
+    private void showAppMenu() {
+        View focused = appListView.getFocusedChild();
+        if (focused == null) return;
+        int pos = appListView.getChildAdapterPosition(focused);
+        if (pos == RecyclerView.NO_POSITION) return;
+        ResolveInfo info = adapter.getItem(pos);
+        if (info == null) return;
+        String pkg = info.activityInfo.packageName;
+        boolean isHidden = hiddenApps.contains(pkg);
+        String appLabel = info.loadLabel(packageManager).toString();
+        new AlertDialog.Builder(requireContext())
+                .setTitle(appLabel)
+                .setItems(new String[]{isHidden ? "Unhide" : "Hide"}, (dialog, which) -> {
+                    setHiddenState(pkg, !isHidden);
+                    refreshList();
+                })
+                .show();
     }
 
     private final class AppListAdapter extends RecyclerView.Adapter<AppListAdapter.AppViewHolder> {
-        private final List<ResolveInfo> apps = new ArrayList<>();
+        private List<ResolveInfo> apps = new ArrayList<>();
 
         void setApps(List<ResolveInfo> newApps) {
-            apps.clear();
-            apps.addAll(newApps);
+            apps = new ArrayList<>(newApps);
             notifyDataSetChanged();
         }
 
-        @Override
-        public int getItemViewType(int position) {
-            return isShowingGrid() ? R.layout.item_app_grid : R.layout.item_app_list;
+        @Nullable
+        ResolveInfo getItem(int position) {
+            if (position < 0 || position >= apps.size()) return null;
+            return apps.get(position);
         }
 
         @NonNull
         @Override
         public AppViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
-            View itemView = LayoutInflater.from(parent.getContext()).inflate(viewType, parent, false);
+            View itemView = LayoutInflater.from(parent.getContext())
+                    .inflate(R.layout.item_app_grid, parent, false);
             return new AppViewHolder(itemView);
         }
 
