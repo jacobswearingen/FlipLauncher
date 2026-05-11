@@ -1,7 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
-<androidx.constraintlayout.widget.ConstraintLayout
+<RelativeLayout
     xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:padding="8dp">
@@ -12,9 +11,7 @@
         android:layout_height="wrap_content"
         android:orientation="horizontal"
         android:gravity="bottom"
-        app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
+        android:layout_centerHorizontal="true"
         android:layout_marginTop="48dp">
 
         <TextView
@@ -44,9 +41,8 @@
         android:text="Thu, Jan 15"
         style="@style/MainText"
         android:textSize="18sp"
-        app:layout_constraintTop_toBottomOf="@id/timeContainer"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"/>
+        android:layout_below="@id/timeContainer"
+        android:layout_centerHorizontal="true"/>
 
     <!-- Bottom left: Notifications -->
     <TextView
@@ -56,8 +52,8 @@
         android:text="Notifications"
         android:textSize="18sp"
         style="@style/MainText"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
+        android:layout_alignParentBottom="true"
+        android:layout_alignParentStart="true"
         android:layout_marginStart="4dp"
         android:layout_marginBottom="4dp"/>
 
@@ -69,22 +65,9 @@
         android:text="Menu"
         android:textSize="18sp"
         style="@style/MainText"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
+        android:layout_alignParentBottom="true"
+        android:layout_centerHorizontal="true"
         android:layout_marginBottom="4dp"/>
 
-    <!-- Bottom right: Shortcuts -->
-    <TextView
-        android:id="@+id/textViewShortcuts"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="Shortcuts"
-        android:textSize="18sp"
-        style="@style/MainText"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        android:layout_marginEnd="4dp"
-        android:layout_marginBottom="4dp"/>
 
-</androidx.constraintlayout.widget.ConstraintLayout>
+</RelativeLayout>

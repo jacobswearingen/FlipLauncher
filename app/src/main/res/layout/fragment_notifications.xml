@@ -1,6 +1,5 @@
-<androidx.constraintlayout.widget.ConstraintLayout
+<RelativeLayout
     xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:padding="8dp">
@@ -12,9 +11,9 @@
         android:text="Notifications"
         android:textSize="18sp"
         android:textStyle="bold"
-        app:layout_constraintTop_toTopOf="parent"
+        style="@style/MainText"
+        android:layout_alignParentTop="true"
         android:gravity="center" />
-        
 
     <LinearLayout
         android:id="@+id/bottomBar"
@@ -22,7 +21,7 @@
         android:layout_height="wrap_content"
         android:orientation="horizontal"
         android:layout_marginBottom="4dp"
-        app:layout_constraintBottom_toBottomOf="parent">
+        android:layout_alignParentBottom="true">
 
         <TextView
             android:id="@+id/textViewClear"
@@ -60,9 +59,9 @@
     <ListView
         android:id="@+id/notificationList"
         android:layout_width="match_parent"
-        android:layout_height="0dp"
-        app:layout_constraintTop_toBottomOf="@id/headerText"
-        app:layout_constraintBottom_toTopOf="@id/bottomBar"
+        android:layout_height="match_parent"
+        android:layout_below="@id/headerText"
+        android:layout_above="@id/bottomBar"
         android:layout_marginBottom="8dp" />
 
-</androidx.constraintlayout.widget.ConstraintLayout>
+</RelativeLayout>
