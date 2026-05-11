@@ -4,60 +4,31 @@ import android.app.Notification;
 import android.service.notification.NotificationListenerService;
 import android.service.notification.StatusBarNotification;
 
+import androidx.lifecycle.LiveData;
+import androidx.lifecycle.MutableLiveData;
+
+import java.util.Arrays;
 import java.util.Collections;
-import java.util.HashSet;
 import java.util.List;
-import java.util.Set;
-import java.util.ArrayList;
 
 public class NotificationService extends NotificationListenerService {
     private static NotificationService instance = null;
+    private static final MutableLiveData<Void> changes = new MutableLiveData<>();
 
-    public interface NotificationListener {
-        void onNotificationsChanged();
-    }
-
-    private static final Set<NotificationListener> listeners = new HashSet<>();
-
-    public static void registerListener(NotificationListener listener) {
-        listeners.add(listener);
-    }
-
-    public static void unregisterListener(NotificationListener listener) {
-        listeners.remove(listener);
-    }
-
-    private static void notifyListeners() {
-        for (NotificationListener listener : listeners) {
-            listener.onNotificationsChanged();
-        }
-    }
+    public static LiveData<Void> getChanges() { return changes; }
 
     public static List<StatusBarNotification> getActiveNotificationsList() {
         NotificationService service = instance;
-        if (service == null) {
-            return Collections.emptyList();
-        }
+        if (service == null) return Collections.emptyList();
         StatusBarNotification[] activeNotifications = service.getActiveNotifications();
-        if (activeNotifications == null) {
-            return Collections.emptyList();
-        }
-        List<StatusBarNotification> list = new ArrayList<>(activeNotifications.length);
-        Collections.addAll(list, activeNotifications);
-        return list;
+        if (activeNotifications == null) return Collections.emptyList();
+        return Arrays.asList(activeNotifications);
     }
 
     public static void cancelNotificationByKey(String key) {
         NotificationService service = instance;
         if (service == null) return;
-        StatusBarNotification[] activeNotifications = service.getActiveNotifications();
-        if (activeNotifications == null) return;
-        for (StatusBarNotification sbn : activeNotifications) {
-            if (sbn.getKey().equals(key) && isNotificationCancelable(sbn)) {
-                service.cancelNotification(key);
-                break;
-            }
-        }
+        service.cancelNotification(key);
     }
 
     private static boolean isNotificationCancelable(StatusBarNotification sbn) {
@@ -72,11 +43,9 @@ public class NotificationService extends NotificationListenerService {
         if (service == null) return;
         StatusBarNotification[] activeNotifications = service.getActiveNotifications();
         if (activeNotifications == null) return;
-        for (StatusBarNotification sbn : activeNotifications) {
-            if (isNotificationCancelable(sbn)) {
-                service.cancelNotification(sbn.getKey());
-            }
-        }
+        Arrays.stream(activeNotifications)
+                .filter(NotificationService::isNotificationCancelable)
+                .forEach(sbn -> service.cancelNotification(sbn.getKey()));
     }
 
     @Override
@@ -94,12 +63,12 @@ public class NotificationService extends NotificationListenerService {
     @Override
     public void onNotificationPosted(StatusBarNotification sbn) {
         super.onNotificationPosted(sbn);
-        notifyListeners();
+        changes.setValue(null);
     }
 
     @Override
     public void onNotificationRemoved(StatusBarNotification sbn) {
         super.onNotificationRemoved(sbn);
-        notifyListeners();
+        changes.setValue(null);
     }
 }

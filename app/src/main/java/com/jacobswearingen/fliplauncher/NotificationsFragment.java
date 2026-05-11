@@ -13,7 +13,6 @@ import android.view.KeyEvent;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.AdapterView;
 import android.widget.BaseAdapter;
 import android.widget.ImageView;
 import android.widget.ListView;
@@ -27,12 +26,9 @@ import androidx.lifecycle.ViewModelProvider;
 import androidx.navigation.fragment.NavHostFragment;
 
 import java.util.Collections;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 public class NotificationsFragment extends Fragment implements KeyEventHandler {
-    private int selectedNotificationIndex = 0;
     private ListView listView;
     private NotificationAdapter adapter;
     private NotificationsViewModel viewModel;
@@ -53,8 +49,8 @@ public class NotificationsFragment extends Fragment implements KeyEventHandler {
         viewModel.getNotifications().observe(getViewLifecycleOwner(), loadedNotifications -> {
             adapter.submitList(loadedNotifications);
             if (!loadedNotifications.isEmpty()) {
-                selectedNotificationIndex = Math.min(selectedNotificationIndex, loadedNotifications.size() - 1);
-                listView.setSelection(selectedNotificationIndex);
+                int current = listView.getSelectedItemPosition();
+                listView.setSelection(Math.min(Math.max(current, 0), loadedNotifications.size() - 1));
             }
         });
         setupListViewListeners();
@@ -64,10 +60,11 @@ public class NotificationsFragment extends Fragment implements KeyEventHandler {
         listView.setOnItemClickListener((parent, view, position, id) -> {
             StatusBarNotification sbn = adapter.getItem(position);
             PendingIntent intent = sbn.getNotification().contentIntent;
+            boolean launched = false;
             if (intent != null) {
                 try {
                     intent.send();
-                    NavHostFragment.findNavController(this).popBackStack(R.id.mainFragment, false);
+                    launched = true;
                 } catch (Exception e) {
                     Toast.makeText(requireContext(), "Cannot perform action", Toast.LENGTH_SHORT).show();
                 }
@@ -76,7 +73,7 @@ public class NotificationsFragment extends Fragment implements KeyEventHandler {
                     Intent launchIntent = packageManager.getLaunchIntentForPackage(sbn.getPackageName());
                     if (launchIntent != null) {
                         startActivity(launchIntent);
-                        NavHostFragment.findNavController(this).popBackStack(R.id.mainFragment, false);
+                        launched = true;
                     } else {
                         Toast.makeText(requireContext(), "Cannot launch app", Toast.LENGTH_SHORT).show();
                     }
@@ -84,15 +81,7 @@ public class NotificationsFragment extends Fragment implements KeyEventHandler {
                     Toast.makeText(requireContext(), "Cannot launch app", Toast.LENGTH_SHORT).show();
                 }
             }
-        });
-
-        listView.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
-            @Override
-            public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
-                selectedNotificationIndex = position;
-            }
-            @Override
-            public void onNothingSelected(AdapterView<?> parent) {}
+            if (launched) NavHostFragment.findNavController(this).popBackStack(R.id.mainFragment, false);
         });
     }
 
@@ -114,7 +103,6 @@ public class NotificationsFragment extends Fragment implements KeyEventHandler {
 
     private class NotificationAdapter extends BaseAdapter {
         private List<StatusBarNotification> items = Collections.emptyList();
-        private final Map<String, Drawable> iconCache = new HashMap<>();
 
         void submitList(List<StatusBarNotification> newList) {
             items = newList != null ? newList : Collections.emptyList();
@@ -126,13 +114,16 @@ public class NotificationsFragment extends Fragment implements KeyEventHandler {
         }
 
         @Override
+        public boolean hasStableIds() { return true; }
+
+        @Override
         public int getCount() { return items.size(); }
 
         @Override
         public StatusBarNotification getItem(int position) { return items.get(position); }
 
         @Override
-        public long getItemId(int position) { return position; }
+        public long getItemId(int position) { return items.get(position).getKey().hashCode(); }
 
         @Override
         public View getView(int position, View convertView, ViewGroup parent) {
@@ -162,18 +153,11 @@ public class NotificationsFragment extends Fragment implements KeyEventHandler {
         }
 
         private Drawable getAppIcon(String packageName) {
-            Drawable cachedIcon = iconCache.get(packageName);
-            if (cachedIcon != null) {
-                return cachedIcon;
-            }
-            Drawable icon;
             try {
-                icon = packageManager.getApplicationIcon(packageName);
+                return packageManager.getApplicationIcon(packageName);
             } catch (Exception e) {
-                icon = androidx.core.content.ContextCompat.getDrawable(requireContext(), android.R.drawable.sym_def_app_icon);
+                return androidx.core.content.ContextCompat.getDrawable(requireContext(), android.R.drawable.sym_def_app_icon);
             }
-            iconCache.put(packageName, icon);
-            return icon;
         }
 
         private static final class ViewHolder {

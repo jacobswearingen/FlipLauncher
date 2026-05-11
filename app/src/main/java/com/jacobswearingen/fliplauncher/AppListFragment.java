@@ -28,6 +28,7 @@ import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 public class AppListFragment extends Fragment implements KeyEventHandler {
     private static final int GRID_COLUMN_COUNT = 3;
@@ -84,13 +85,9 @@ public class AppListFragment extends Fragment implements KeyEventHandler {
 
     private void refreshList() {
         if (adapter == null) return;
-        List<ResolveInfo> displayed = new ArrayList<>();
-        for (ResolveInfo info : allApps) {
-            boolean isHidden = hiddenApps.contains(info.activityInfo.packageName);
-            if (showingHidden ? isHidden : !isHidden) {
-                displayed.add(info);
-            }
-        }
+        List<ResolveInfo> displayed = allApps.stream()
+                .filter(info -> hiddenApps.contains(info.activityInfo.packageName) == showingHidden)
+                .collect(Collectors.toList());
         adapter.setApps(displayed);
         focusFirstItem();
     }
@@ -166,7 +163,15 @@ public class AppListFragment extends Fragment implements KeyEventHandler {
 
         @Override
         public void onBindViewHolder(@NonNull AppViewHolder holder, int position) {
-            holder.bind(apps.get(position));
+            ResolveInfo info = apps.get(position);
+            CharSequence labelText = info.loadLabel(packageManager);
+            holder.label.setText(labelText);
+            holder.icon.setContentDescription(labelText);
+            try {
+                holder.icon.setImageDrawable(info.loadIcon(packageManager));
+            } catch (Exception e) {
+                holder.icon.setImageDrawable(ContextCompat.getDrawable(requireContext(), android.R.drawable.sym_def_app_icon));
+            }
         }
 
         @Override
@@ -175,29 +180,18 @@ public class AppListFragment extends Fragment implements KeyEventHandler {
         }
 
         final class AppViewHolder extends RecyclerView.ViewHolder {
-            private final TextView label;
-            private final ImageView icon;
+            final TextView label;
+            final ImageView icon;
 
             AppViewHolder(@NonNull View itemView) {
                 super(itemView);
                 label = itemView.findViewById(R.id.appLabel);
                 icon = itemView.findViewById(R.id.appIcon);
-            }
-
-            void bind(ResolveInfo info) {
-                CharSequence labelText = info.loadLabel(packageManager);
-                label.setText(labelText);
-                try {
-                    icon.setImageDrawable(info.loadIcon(packageManager));
-                    icon.setContentDescription(labelText);
-                } catch (Exception e) {
-                    icon.setImageDrawable(ContextCompat.getDrawable(requireContext(), android.R.drawable.sym_def_app_icon));
-                    icon.setContentDescription(labelText);
-                }
-
                 itemView.setOnClickListener(v -> {
+                    int pos = getBindingAdapterPosition();
+                    if (pos == RecyclerView.NO_POSITION) return;
                     try {
-                        Intent launchIntent = packageManager.getLaunchIntentForPackage(info.activityInfo.packageName);
+                        Intent launchIntent = packageManager.getLaunchIntentForPackage(apps.get(pos).activityInfo.packageName);
                         if (launchIntent != null) {
                             startActivity(launchIntent);
                             NavHostFragment.findNavController(AppListFragment.this).popBackStack(R.id.mainFragment, false);

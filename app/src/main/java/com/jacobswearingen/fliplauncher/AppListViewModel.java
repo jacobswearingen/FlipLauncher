@@ -12,9 +12,12 @@ import androidx.lifecycle.LiveData;
 import androidx.lifecycle.MutableLiveData;
 
 import java.util.List;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 
 public class AppListViewModel extends AndroidViewModel {
     private final MutableLiveData<List<ResolveInfo>> _apps = new MutableLiveData<>();
+    private final ExecutorService executor = Executors.newSingleThreadExecutor();
     public LiveData<List<ResolveInfo>> getApps() { return _apps; }
 
     public AppListViewModel(@NonNull Application application) {
@@ -22,8 +25,14 @@ public class AppListViewModel extends AndroidViewModel {
         loadApps();
     }
 
+    @Override
+    protected void onCleared() {
+        executor.shutdownNow();
+        super.onCleared();
+    }
+
     private void loadApps() {
-        new Thread(() -> {
+        executor.execute(() -> {
             final PackageManager pm = getApplication().getPackageManager();
             final Intent intent = new Intent(Intent.ACTION_MAIN);
             intent.addCategory(Intent.CATEGORY_LAUNCHER);
@@ -39,6 +48,6 @@ public class AppListViewModel extends AndroidViewModel {
                 return String.valueOf(la).toLowerCase().compareTo(String.valueOf(lb).toLowerCase());
             });
             _apps.postValue(result);
-        }).start();
+        });
     }
 }
