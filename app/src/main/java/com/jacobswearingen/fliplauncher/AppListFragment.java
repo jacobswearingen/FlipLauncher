@@ -61,7 +61,7 @@ public class AppListFragment extends Fragment implements KeyEventHandler {
         super.onCreate(savedInstanceState);
         prefs = requireContext().getSharedPreferences("applist_prefs", Context.MODE_PRIVATE);
         packageManager = requireContext().getPackageManager();
-        viewModel = new ViewModelProvider(this).get(AppListViewModel.class);
+        viewModel = new ViewModelProvider(requireActivity()).get(AppListViewModel.class);
         loadHiddenApps();
     }
 

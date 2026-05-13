@@ -1,7 +1,10 @@
 package com.jacobswearingen.fliplauncher;
 
 import android.app.Application;
+import android.content.BroadcastReceiver;
+import android.content.Context;
 import android.content.Intent;
+import android.content.IntentFilter;
 import android.content.pm.PackageManager;
 import android.content.pm.ResolveInfo;
 import android.graphics.drawable.Drawable;
@@ -20,17 +23,35 @@ import java.util.concurrent.Executors;
 public class AppListViewModel extends AndroidViewModel {
     private final MutableLiveData<List<AppInfo>> _apps = new MutableLiveData<>();
     private final ExecutorService executor = Executors.newSingleThreadExecutor();
-    public LiveData<List<AppInfo>> getApps() { return _apps; }
+
+    private final BroadcastReceiver packageReceiver = new BroadcastReceiver() {
+        @Override
+        public void onReceive(Context context, Intent intent) {
+            loadApps();
+        }
+    };
 
     public AppListViewModel(@NonNull Application application) {
         super(application);
+        IntentFilter filter = new IntentFilter();
+        filter.addAction(Intent.ACTION_PACKAGE_ADDED);
+        filter.addAction(Intent.ACTION_PACKAGE_REMOVED);
+        filter.addAction(Intent.ACTION_PACKAGE_REPLACED);
+        filter.addAction(Intent.ACTION_PACKAGE_CHANGED);
+        filter.addDataScheme("package");
+        application.registerReceiver(packageReceiver, filter);
         loadApps();
     }
 
     @Override
     protected void onCleared() {
+        getApplication().unregisterReceiver(packageReceiver);
         executor.shutdownNow();
         super.onCleared();
+    }
+
+    public LiveData<List<AppInfo>> getApps() {
+        return _apps;
     }
 
     private void loadApps() {
@@ -44,7 +65,6 @@ public class AppListViewModel extends AndroidViewModel {
             } else {
                 resolveInfos = pm.queryIntentActivities(intent, 0);
             }
-            // Pre-load labels once so sorting doesn't call IPC repeatedly
             List<AppInfo> result = new ArrayList<>(resolveInfos.size());
             for (ResolveInfo info : resolveInfos) {
                 String label = info.loadLabel(pm).toString();
@@ -61,3 +81,4 @@ public class AppListViewModel extends AndroidViewModel {
         });
     }
 }
+
