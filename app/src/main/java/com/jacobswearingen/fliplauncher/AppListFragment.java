@@ -4,7 +4,6 @@ import android.app.AlertDialog;
 import android.content.Context;
 import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
-import android.content.pm.ResolveInfo;
 import android.content.Intent;
 import android.os.Bundle;
 import android.view.KeyEvent;
@@ -16,7 +15,6 @@ import android.widget.TextView;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
-import androidx.core.content.ContextCompat;
 import androidx.fragment.app.Fragment;
 import androidx.lifecycle.ViewModelProvider;
 import androidx.navigation.fragment.NavHostFragment;
@@ -40,7 +38,7 @@ public class AppListFragment extends Fragment implements KeyEventHandler {
     private SharedPreferences prefs;
     private AppListAdapter adapter;
     private PackageManager packageManager;
-    private List<ResolveInfo> allApps = Collections.emptyList();
+    private List<AppInfo> allApps = Collections.emptyList();
     private Set<String> hiddenApps = new HashSet<>();
     private boolean showingHidden = false;
 
@@ -78,15 +76,15 @@ public class AppListFragment extends Fragment implements KeyEventHandler {
         adapter = new AppListAdapter();
         appListView.setAdapter(adapter);
         viewModel.getApps().observe(getViewLifecycleOwner(), apps -> {
-            allApps = apps != null ? apps : Collections.emptyList();
+            allApps = apps != null ? apps : Collections.<AppInfo>emptyList();
             refreshList();
         });
     }
 
     private void refreshList() {
         if (adapter == null) return;
-        List<ResolveInfo> displayed = allApps.stream()
-                .filter(info -> hiddenApps.contains(info.activityInfo.packageName) == showingHidden)
+        List<AppInfo> displayed = allApps.stream()
+                .filter(info -> hiddenApps.contains(info.getPackageName()) == showingHidden)
                 .collect(Collectors.toList());
         adapter.setApps(displayed);
         focusFirstItem();
@@ -125,13 +123,12 @@ public class AppListFragment extends Fragment implements KeyEventHandler {
         if (focused == null) return;
         int pos = appListView.getChildAdapterPosition(focused);
         if (pos == RecyclerView.NO_POSITION) return;
-        ResolveInfo info = adapter.getItem(pos);
+        AppInfo info = adapter.getItem(pos);
         if (info == null) return;
-        String pkg = info.activityInfo.packageName;
+        String pkg = info.getPackageName();
         boolean isHidden = hiddenApps.contains(pkg);
-        String appLabel = info.loadLabel(packageManager).toString();
         new AlertDialog.Builder(requireContext())
-                .setTitle(appLabel)
+                .setTitle(info.label)
                 .setItems(new String[]{isHidden ? "Unhide" : "Hide"}, (dialog, which) -> {
                     setHiddenState(pkg, !isHidden);
                     refreshList();
@@ -140,15 +137,15 @@ public class AppListFragment extends Fragment implements KeyEventHandler {
     }
 
     private final class AppListAdapter extends RecyclerView.Adapter<AppListAdapter.AppViewHolder> {
-        private List<ResolveInfo> apps = new ArrayList<>();
+        private List<AppInfo> apps = new ArrayList<>();
 
-        void setApps(List<ResolveInfo> newApps) {
+        void setApps(List<AppInfo> newApps) {
             apps = new ArrayList<>(newApps);
             notifyDataSetChanged();
         }
 
         @Nullable
-        ResolveInfo getItem(int position) {
+        AppInfo getItem(int position) {
             if (position < 0 || position >= apps.size()) return null;
             return apps.get(position);
         }
@@ -163,15 +160,10 @@ public class AppListFragment extends Fragment implements KeyEventHandler {
 
         @Override
         public void onBindViewHolder(@NonNull AppViewHolder holder, int position) {
-            ResolveInfo info = apps.get(position);
-            CharSequence labelText = info.loadLabel(packageManager);
-            holder.label.setText(labelText);
-            holder.icon.setContentDescription(labelText);
-            try {
-                holder.icon.setImageDrawable(info.loadIcon(packageManager));
-            } catch (Exception e) {
-                holder.icon.setImageDrawable(ContextCompat.getDrawable(requireContext(), android.R.drawable.sym_def_app_icon));
-            }
+            AppInfo info = apps.get(position);
+            holder.label.setText(info.label);
+            holder.icon.setContentDescription(info.label);
+            holder.icon.setImageDrawable(info.icon);
         }
 
         @Override
@@ -191,7 +183,7 @@ public class AppListFragment extends Fragment implements KeyEventHandler {
                     int pos = getBindingAdapterPosition();
                     if (pos == RecyclerView.NO_POSITION) return;
                     try {
-                        Intent launchIntent = packageManager.getLaunchIntentForPackage(apps.get(pos).activityInfo.packageName);
+                        Intent launchIntent = packageManager.getLaunchIntentForPackage(apps.get(pos).getPackageName());
                         if (launchIntent != null) {
                             startActivity(launchIntent);
                             NavHostFragment.findNavController(AppListFragment.this).popBackStack(R.id.mainFragment, false);
